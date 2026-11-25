@@ -38,6 +38,7 @@ class EdgeSwipeTrackerTest {
   private var edgesInUse = Edge.entries.filter { !it.along }.toSet()
   private var stagesInUse = listOf(1, 2)
   private var menus = emptyMap<MenuEdge, Int>()
+  private var horizontalMenus = emptySet<MenuEdge>()
   private val tracker =
     EdgeSwipeTracker(
       edgeZonePx = 30f,
@@ -78,6 +79,7 @@ class EdgeSwipeTrackerTest {
           }
         },
       menuItemCount = { menus[it] ?: 0 },
+      menuHorizontal = { it in horizontalMenus },
     )
   private var time = 0L
 
@@ -467,6 +469,103 @@ class EdgeSwipeTrackerTest {
     touch(MotionEvent.ACTION_UP, 400f, 5f)
     assertEquals(listOf<String>(), events)
     assertEquals(false, tracker.isActive)
+  }
+
+  @Test
+  fun horizontalMenuGoesAcrossTheScreenFromItsEdge() {
+    // Four items of 75 pixels each, from the left edge.
+    menus = mapOf(MenuEdge.LEFT to 4)
+    horizontalMenus = setOf(MenuEdge.LEFT)
+    slideSideways(5f, 500f, 50f, 110f, 160f, 290f, 60f, 2f)
+    assertEquals(
+      listOf("start", "LEFT -1>1", "LEFT 1>2", "LEFT 2>3", "LEFT 3>0", "LEFT chose 0"),
+      events,
+    )
+    assertEquals(listOf<Pair<Edge, Int>>(), ended)
+  }
+
+  @Test
+  fun rightHorizontalMenuIsMirroredAndTheLeftStaysVertical() {
+    menus = mapOf(MenuEdge.LEFT to 4, MenuEdge.RIGHT to 4)
+    horizontalMenus = setOf(MenuEdge.RIGHT)
+    slideSideways(295f, 500f, 250f, 190f, 10f)
+    slideThrough(5f, 300f, 5f, 360f, 5f, 400f)
+    assertEquals(
+      listOf(
+        "start", "RIGHT -1>1", "RIGHT 1>3", "RIGHT chose 3",
+        "start", "LEFT -1>1", "LEFT chose 1",
+      ),
+      events,
+    )
+  }
+
+  @Test
+  fun movingUpOrDownLeavesTheHorizontalMenuAndComingBackReturns() {
+    menus = mapOf(MenuEdge.LEFT to 4)
+    horizontalMenus = setOf(MenuEdge.LEFT)
+    slideThrough(
+      5f, 500f, 60f, 500f, 110f, 505f, 120f, 600f, 130f, 560f, 140f, 380f, 150f, 420f, 160f, 300f,
+    )
+    assertEquals(
+      listOf(
+        "start", "LEFT -1>1", "LEFT 1>-1", "LEFT -1>1", "LEFT 1>-1", "LEFT -1>2", "LEFT 2>-1",
+        "LEFT chose -1",
+      ),
+      events,
+    )
+  }
+
+  @Test
+  fun slideInAtAnAngleStartsTheHorizontalMenuOnAnItem() {
+    menus = mapOf(MenuEdge.LEFT to 4)
+    horizontalMenus = setOf(MenuEdge.LEFT)
+    // 45 degrees down: up and down count from where the menu took over, not from the touch.
+    slideThrough(5f, 500f, 55f, 550f, 105f, 600f)
+    assertEquals(listOf("start", "LEFT -1>1", "LEFT chose 1"), events)
+  }
+
+  @Test
+  fun horizontalMenuReplacesSlidesInFromItsEdgeOnly() {
+    menus = mapOf(MenuEdge.LEFT to 2)
+    horizontalMenus = setOf(MenuEdge.LEFT)
+    slideSideways(5f, 200f, 50f, 250f)
+    slideSideways(295f, 200f, 250f, 150f)
+    assertEquals(
+      listOf("start", "LEFT -1>1", "LEFT chose 1", "start", "0>1", "end 1"),
+      events,
+    )
+    assertEquals(listOf(Edge.RIGHT_TOP to 1), ended)
+    assertEquals(listOf(Edge.LEFT_TOP, Edge.RIGHT_TOP), touched)
+  }
+
+  @Test
+  fun horizontalMenuEdgeSlidesAlongAndScrollsAgain() {
+    edgesInUse = setOf(Edge.ALONG_LEFT_UP)
+    scrollingSlides = setOf(Edge.ALONG_LEFT_DOWN)
+    menus = mapOf(MenuEdge.LEFT to 2)
+    horizontalMenus = setOf(MenuEdge.LEFT)
+    slideThrough(5f, 500f, 8f, 450f, 10f, 380f)
+    slideThrough(5f, 500f, 7f, 530f, 9f, 700f)
+    assertEquals(listOf(Edge.ALONG_LEFT_UP to 1), ended)
+    assertEquals(listOf(Edge.ALONG_LEFT_DOWN), scrolled)
+    assertEquals(listOf("start", "0>1", "end 1", "scroll"), events)
+  }
+
+  @Test
+  fun horizontalMenuStartsFromCornersWhereTopAndBottomScrollingStillWins() {
+    edgesInUse = setOf(Edge.BOTTOM)
+    scrollingSlides = setOf(Edge.ALONG_TOP_RIGHT)
+    menus = mapOf(MenuEdge.LEFT to 2)
+    horizontalMenus = setOf(MenuEdge.LEFT)
+    slideThrough(5f, 995f, 8f, 950f, 10f, 880f)
+    slideSideways(5f, 995f, 50f, 110f)
+    slideThrough(5f, 5f, 25f, 7f, 60f, 8f)
+    assertEquals(
+      listOf("start", "0>1", "end 1", "start", "LEFT -1>0", "LEFT chose 0", "scroll"),
+      events,
+    )
+    assertEquals(listOf(Edge.BOTTOM to 1), ended)
+    assertEquals(listOf(Edge.ALONG_TOP_RIGHT), scrolled)
   }
 
   private fun twoFingers(action: Int): MotionEvent {
