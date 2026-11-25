@@ -523,6 +523,23 @@ class TrackedGestureTest {
   }
 
   @Test
+  fun slidingInFromAHorizontalMenuEdgeRunsTheItemTheFingerLiftsOn() {
+    // Home is the left half of the screen's width and Back the right half.
+    leftEdgeMenu(R.string.shortcut_value_home, R.string.shortcut_value_back)
+    SharedPreferencesUtils.getSharedPreferences(service)
+      .edit()
+      .putBoolean(EdgeMenus.horizontalKey(MenuEdge.LEFT), true)
+      .commit()
+    slideSideways(200f, 5f, 300f)
+    slideSideways(200f, 5f, 120f)
+    assertEquals(
+      listOf(service.getString(R.string.shortcut_value_back), service.getString(R.string.shortcut_value_home)),
+      service.commands,
+    )
+    assertEquals(listOf<Int>(), service.gestures)
+  }
+
+  @Test
   fun menuEdgeWhoseSwitchIsOffIsAnOrdinarySwipe() {
     leftEdgeMenu(R.string.shortcut_value_home, on = false)
     slide(5f, 300f, 150f)
