@@ -1231,6 +1231,8 @@
     <string name="quick_settings_no_system_tiles">No system tiles to add</string>
     <!-- Spoken when SandFly can't find a tile in the system's quick settings to use it. %1$s is the tile's name. [CHAR_LIMIT=NONE] -->
     <string name="quick_settings_tile_not_found">%1$s isn\'t in the system\'s quick settings</string>
+    <!-- Spoken when a quick settings tile command fails, such as when the system's quick settings don't open or SystemUI rejects the command. %1$s is the tile's name. [CHAR_LIMIT=NONE] -->
+    <string name="quick_settings_tile_failed"><xliff:g id="tile_name" example="Hotspot">%1$s</xliff:g> failed</string>
     <!-- A screen timeout in SandFly's quick settings panel: the screen never turns off by itself. [CHAR_LIMIT=NONE] -->
     <string name="quick_settings_never">Never</string>
     <!-- A screen timeout in SandFly's quick settings panel, in seconds. [CHAR_LIMIT=NONE] -->
@@ -2376,6 +2378,8 @@
     <string name="app_shortcut_added">Added <xliff:g id="name" example="MacroDroid: Morning">%1$s</xliff:g></string>
     <!-- Said when a command that opens an app shortcut fails, because the app or shortcut is gone or its activity can't start. [CHAR_LIMIT=NONE] -->
     <string name="app_shortcut_not_opened">Could not open app shortcut</string>
+    <!-- Said when a command opens an app shortcut that only Shizuku can open, while Shizuku isn't allowed or runs as root. [CHAR_LIMIT=NONE] -->
+    <string name="app_shortcut_needs_shizuku">App shortcut needs Shizuku started through adb or wireless debugging</string>
 
     <!-- Label for a shortcut that is not assigned and does nothing. [CHAR_LIMIT=40] -->
     <string name="shortcut_unassigned">Unassigned</string>

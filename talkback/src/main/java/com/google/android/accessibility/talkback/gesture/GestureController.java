@@ -176,6 +176,7 @@ import com.google.android.accessibility.talkback.selector.SwipeValueDirection;
 import com.google.android.accessibility.talkback.status.StatusReader;
 import com.google.android.accessibility.talkback.trainingcommon.TrainingActivity;
 import com.google.android.accessibility.talkback.trainingcommon.content.TutorialGestureUses;
+import com.google.android.accessibility.talkback.trainer.GestureTrainerHooks;
 import com.google.android.accessibility.talkback.tutorial.TutorialHooks;
 import com.google.android.accessibility.talkback.utils.DateTimeUtils;
 import com.google.android.accessibility.talkback.utils.DebugProperties;
@@ -689,10 +690,15 @@ public class GestureController {
           service,
           action,
           opened -> {
-            if (!opened) {
+            if (opened != AppShortcutActions.Opened.YES) {
               pipeline.returnFeedback(
                   EVENT_ID_UNTRACKED,
-                  Feedback.requestedSpeech(service.getString(R.string.app_shortcut_not_opened)));
+                  Feedback.requestedSpeech(
+                      service.getString(
+                          opened == AppShortcutActions.Opened.NEEDS_SHIZUKU
+                              ? R.string.app_shortcut_needs_shizuku
+                              : R.string.app_shortcut_not_opened)));
+              pipeline.returnFeedback(EVENT_ID_UNTRACKED, Feedback.sound(R.raw.complete));
             }
             return kotlin.Unit.INSTANCE;
           });
@@ -1689,6 +1695,9 @@ public class GestureController {
     if (gestureId == GESTURE_FAKED_SPLIT_TYPING_AND_HOLD) {
       // The intended behavior is simulating the non-customizable gesture "double-tap-and-hold".
       gestureId = GESTURE_DOUBLE_TAP_AND_HOLD;
+    }
+    if (GestureTrainerHooks.onGesture(gestureId)) {
+      return;
     }
     if (gestureHandledByTraining(gestureId, /* isFingerprintGesture= */ false)) {
       return;
