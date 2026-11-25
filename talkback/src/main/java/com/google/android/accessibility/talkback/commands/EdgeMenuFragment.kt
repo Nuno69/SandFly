@@ -58,6 +58,8 @@ class EdgeMenuFragment : NotificationCodeFragment(R.string.title_pref_edge_menu_
     // Closes the gap left by a command changed to none.
     EdgeMenus.setItems(prefs, edge, items)
     val switchKey = EdgeMenus.switchKey(edge)
+    // Which way the menu goes can only be changed while the edge is a menu.
+    lateinit var horizontalSwitch: Preference
     screen.switch(
       getString(
         if (edge == MenuEdge.LEFT) R.string.title_pref_edge_menu_left_switch
@@ -66,14 +68,17 @@ class EdgeMenuFragment : NotificationCodeFragment(R.string.title_pref_edge_menu_
       prefs.getBoolean(switchKey, false),
     ) {
       prefs.edit { putBoolean(switchKey, it) }
+      horizontalSwitch.isEnabled = it
     }
     val horizontalKey = EdgeMenus.horizontalKey(edge)
-    screen.switch(
-      getString(R.string.title_pref_edge_menu_horizontal),
-      prefs.getBoolean(horizontalKey, false),
-    ) {
-      prefs.edit { putBoolean(horizontalKey, it) }
-    }
+    horizontalSwitch =
+      screen.switch(
+        getString(R.string.title_pref_edge_menu_horizontal),
+        prefs.getBoolean(horizontalKey, false),
+      ) {
+        prefs.edit { putBoolean(horizontalKey, it) }
+      }
+    horizontalSwitch.isEnabled = prefs.getBoolean(switchKey, false)
     val category = screen.category(R.string.item_list_current)
     val names = Commands.labels(context, items)
     items.forEachIndexed { index, command ->
