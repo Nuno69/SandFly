@@ -24,7 +24,7 @@ Add a `<meta-data>` element inside your `<application>` element that names an XM
 
 ```xml
 <meta-data
-    android:name="fyi.quin.backtalk.direct_touch"
+    android:name="io.github.aaron_gh.sandfly.direct_touch"
     android:resource="@xml/direct_touch" />
 ```
 
@@ -109,11 +109,11 @@ On Android 11 and later, also make SandFly visible to your app:
 </queries>
 ```
 
-Copy `talkback/src/main/aidl/fyi/quin/backtalk/directtouch/IDirectTouch.aidl` into your app, keeping the package `fyi.quin.backtalk.directtouch`, and bind to the service:
+Copy `talkback/src/main/aidl/io/github/aaron_gh/sandfly/directtouch/IDirectTouch.aidl` into your app, keeping the package `io.github.aaron_gh.sandfly.directtouch`, and bind to the service:
 
 ```kotlin
 val intent =
-  Intent("fyi.quin.backtalk.action.DIRECT_TOUCH").setPackage("io.github.aaron_gh.sandfly")
+  Intent("io.github.aaron_gh.sandfly.action.DIRECT_TOUCH").setPackage("io.github.aaron_gh.sandfly")
 context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
 ```
 
@@ -152,3 +152,46 @@ directTouch.setState(client, null)
 Each request replaces the one before it. Calls are one-way and return at once. They apply only while your app is in front; a request made in the background applies when your app comes to the front. Areas are limited to your app's window. Rectangles in screen pixels don't follow your layout, so send them again when it changes, or use view IDs, which SandFly looks up again as your content changes.
 
 If SandFly restarts, the connection reports `onServiceDisconnected`, then `onServiceConnected` when SandFly is back. Send your request and state again in `onServiceConnected`.
+
+## Keyboards in an accessibility overlay
+
+A keyboard that has an accessibility service of its own and draws its keys in an accessibility overlay sets the touch exploration pass-through region for that overlay itself. Android keeps one region for all accessibility services, so any region SandFly set would replace the keyboard's. While such a keyboard is the default keyboard, its accessibility service is on and its overlay is on screen, SandFly adds the overlay's bounds to every pass-through region it sets, such as for direct touch or the navigation bar. A SandFly feature that takes the whole pass-through region for a moment, such as the circle menu, still gets it alone, and locking touch still clears it.
+
+To check whether the installed SandFly does this, read the `io.github.aaron_gh.sandfly.keeps_keyboard_region` meta-data of its direct touch service. It needs no permission, only the `<queries>` element above:
+
+```kotlin
+val keepsKeyboardRegion =
+  context.packageManager
+    .queryIntentServices(
+      Intent("io.github.aaron_gh.sandfly.action.DIRECT_TOUCH").setPackage("io.github.aaron_gh.sandfly"),
+      PackageManager.GET_META_DATA,
+    )
+    .firstOrNull()
+    ?.serviceInfo
+    ?.metaData
+    ?.getBoolean("io.github.aaron_gh.sandfly.keeps_keyboard_region") == true
+```
+
+SandFly 0.7.0 and earlier have no such meta-data, and can replace the keyboard's region.
+
+## Deprecated names
+
+These names are deprecated:
+
+| Deprecated | Use |
+| --- | --- |
+| `fyi.quin.backtalk.direct_touch` | `io.github.aaron_gh.sandfly.direct_touch` |
+| `fyi.quin.backtalk.action.DIRECT_TOUCH` | `io.github.aaron_gh.sandfly.action.DIRECT_TOUCH` |
+| `fyi.quin.backtalk.directtouch.IDirectTouch` | `io.github.aaron_gh.sandfly.directtouch.IDirectTouch` |
+
+The deprecated action binds the deprecated interface, so change both together. A manifest with both meta-data keys is read with the new one.
+
+SandFly 27.0 and later still take these names from apps built against them, and log a warning with the tag `SandFlyApi` the first time each app uses one while SandFly runs. To see the warnings:
+
+```sh
+adb logcat -s SandFlyApi
+```
+
+If your app is a debuggable build, SandFly also posts a notification that lists the deprecated names it used.
+
+The deprecated names will be removed in a later release. SandFly 0.7.0 and earlier take only the deprecated names. To work with those too, bind with the new action first and with the deprecated one when `bindService` returns false.

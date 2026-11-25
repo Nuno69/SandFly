@@ -24,7 +24,7 @@ Wewnątrz `<application>` dodaj `<meta-data>` z zasobem XML:
 
 ```xml
 <meta-data
-    android:name="fyi.quin.backtalk.direct_touch"
+    android:name="io.github.aaron_gh.sandfly.direct_touch"
     android:resource="@xml/direct_touch" />
 ```
 
@@ -105,11 +105,11 @@ Od Androida 11 dodaj widoczność pakietu:
 </queries>
 ```
 
-Skopiuj `talkback/src/main/aidl/fyi/quin/backtalk/directtouch/IDirectTouch.aidl` i zachowaj pakiet `fyi.quin.backtalk.directtouch`. Połącz się z usługą:
+Skopiuj `talkback/src/main/aidl/io/github/aaron_gh/sandfly/directtouch/IDirectTouch.aidl` i zachowaj pakiet `io.github.aaron_gh.sandfly.directtouch`. Połącz się z usługą:
 
 ```kotlin
 val intent =
-  Intent("fyi.quin.backtalk.action.DIRECT_TOUCH").setPackage("io.github.aaron_gh.sandfly")
+  Intent("io.github.aaron_gh.sandfly.action.DIRECT_TOUCH").setPackage("io.github.aaron_gh.sandfly")
 context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
 ```
 
@@ -148,3 +148,46 @@ directTouch.setState(client, null)
 Każde żądanie zastępuje poprzednie. Wywołania są jednokierunkowe i wracają od razu. Żądanie obowiązuje, tylko gdy aplikacja jest na pierwszym planie. Jeśli wyślesz je z tła, zacznie działać po przejściu aplikacji na pierwszy plan. Obszary są przycinane do okna aplikacji. Po zmianie układu wyślij ponownie prostokąty podane w pikselach ekranu. Możesz też użyć identyfikatorów widoków. SandFly przy zmianach zawartości ponownie ustali ich położenie.
 
 Po ponownym uruchomieniu SandFly połączenie zgłasza `onServiceDisconnected`, a potem `onServiceConnected`. Wyślij żądanie i stan ponownie w `onServiceConnected`.
+
+## Klawiatury w nakładce ułatwień dostępu {#keyboards-in-an-accessibility-overlay}
+
+Klawiatura z własną usługą ułatwień dostępu, która rysuje klawisze w nakładce ułatwień dostępu, sama ustawia dla tej nakładki obszar przepuszczania dotyku z pominięciem czytania dotykiem. Android przechowuje jeden taki obszar dla wszystkich usług ułatwień dostępu, więc każdy obszar ustawiony przez SandFly zastępowałby obszar klawiatury. Gdy taka klawiatura jest klawiaturą domyślną, jej usługa ułatwień dostępu jest włączona, a nakładka widoczna na ekranie, SandFly dodaje granice nakładki do każdego ustawianego obszaru przepuszczania, na przykład dla dotyku bezpośredniego lub paska nawigacji. Funkcja SandFly, która na chwilę przejmuje cały obszar przepuszczania, na przykład menu kołowe, nadal dostaje go w całości, a zablokowanie dotyku nadal go czyści.
+
+Aby sprawdzić, czy zainstalowany SandFly tak działa, odczytaj metadane `io.github.aaron_gh.sandfly.keeps_keyboard_region` jego usługi dotyku bezpośredniego. Nie wymaga to uprawnień, tylko opisanego wyżej elementu `<queries>`:
+
+```kotlin
+val keepsKeyboardRegion =
+  context.packageManager
+    .queryIntentServices(
+      Intent("io.github.aaron_gh.sandfly.action.DIRECT_TOUCH").setPackage("io.github.aaron_gh.sandfly"),
+      PackageManager.GET_META_DATA,
+    )
+    .firstOrNull()
+    ?.serviceInfo
+    ?.metaData
+    ?.getBoolean("io.github.aaron_gh.sandfly.keeps_keyboard_region") == true
+```
+
+SandFly 0.7.0 i starsze nie mają tych metadanych i mogą zastąpić obszar klawiatury.
+
+## Przestarzałe nazwy {#deprecated-names}
+
+Te nazwy są przestarzałe:
+
+| Przestarzała nazwa | Nowa nazwa |
+| --- | --- |
+| `fyi.quin.backtalk.direct_touch` | `io.github.aaron_gh.sandfly.direct_touch` |
+| `fyi.quin.backtalk.action.DIRECT_TOUCH` | `io.github.aaron_gh.sandfly.action.DIRECT_TOUCH` |
+| `fyi.quin.backtalk.directtouch.IDirectTouch` | `io.github.aaron_gh.sandfly.directtouch.IDirectTouch` |
+
+Przestarzała akcja łączy się z przestarzałym interfejsem, więc zmień obie nazwy jednocześnie. Gdy manifest zawiera oba klucze metadanych, SandFly odczytuje nowy.
+
+SandFly 27.0 i nowsze nadal przyjmują te nazwy od aplikacji, które z nich korzystają. Gdy aplikacja użyje jednej z nich po raz pierwszy od uruchomienia SandFly, SandFly zapisuje w logu ostrzeżenie z tagiem `SandFlyApi`. Aby wyświetlić ostrzeżenia:
+
+```sh
+adb logcat -s SandFlyApi
+```
+
+Gdy aplikacja jest kompilacją z możliwością debugowania, SandFly wyświetla też powiadomienie z listą użytych przez nią przestarzałych nazw.
+
+Przestarzałe nazwy zostaną usunięte w jednej z kolejnych wersji. SandFly 0.7.0 i starsze przyjmują tylko przestarzałe nazwy. Aby obsługiwać także te wersje, połącz się z usługą najpierw przez nową akcję, a gdy `bindService` zwróci false, przez przestarzałą.
