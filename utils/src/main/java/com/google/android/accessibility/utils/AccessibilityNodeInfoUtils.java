@@ -80,6 +80,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1581,6 +1582,24 @@ public class AccessibilityNodeInfoUtils {
   /** Returns whether {@code node} has the chrome role "link". */
   public static boolean isChromeRoleLink(@Nullable AccessibilityNodeInfoCompat node) {
     return node != null && TextUtils.equals(getChromeRole(node), CHROME_ROLE_LINK);
+  }
+
+  /** Returns whether {@code node} is the root of a web document, whose chrome role is "rootWebArea". */
+  public static boolean isWebDocument(@Nullable AccessibilityNodeInfoCompat node) {
+    return node != null && TextUtils.equals(getChromeRole(node), "rootWebArea");
+  }
+
+  /**
+   * Returns the nodes under {@code root} with the resource ID {@code viewId}, or none when the node
+   * can't be asked, as one that didn't come from an app.
+   */
+  public static List<AccessibilityNodeInfoCompat> findNodesByViewId(
+      AccessibilityNodeInfoCompat root, String viewId) {
+    try {
+      return root.findAccessibilityNodeInfosByViewId(viewId);
+    } catch (IllegalStateException e) {
+      return Collections.emptyList();
+    }
   }
 
   /** Returns whether {@code node} is a landmark of a web page, such as its navigation or main. */

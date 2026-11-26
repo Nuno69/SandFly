@@ -89,6 +89,12 @@
             android:summary="@string/summary_selector_vertical_navigation"/>
         <com.google.android.accessibility.material.preference.AccessibilitySuiteCheckBoxPreference
             android:layout="@layout/listitem_2texts"
+            android:defaultValue="@bool/pref_selector_place_markers_default"
+            android:key="@string/pref_selector_place_markers_key"
+            android:title="@string/title_place_markers"
+            android:summary="@string/summary_selector_place_markers"/>
+        <com.google.android.accessibility.material.preference.AccessibilitySuiteCheckBoxPreference
+            android:layout="@layout/listitem_2texts"
             android:defaultValue="@bool/pref_selector_scroll_seq_default"
             android:key="@string/pref_selector_scroll_seq_key"
             android:title="@string/title_pref_support_scroll_seq"

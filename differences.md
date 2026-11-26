@@ -467,6 +467,10 @@ The **Vertical navigation** reading control moves to the item below when you swi
 
 **Move to item below** and **Move to item above**, in the **Navigation** category, make the same moves from a gesture or keyboard shortcut, without the reading control. **Move to item on the left** and **Move to item on the right** move to the nearest item on screen in that direction. None of them has a gesture by default.
 
+### Place markers
+
+TalkBack has no place markers. In SandFly, each screen of an app, and each page in a browser, has up to 10 numbered markers on items you want to come back to, set and found with the commands of the **Place markers** category and the **Place markers** reading control. A marker finds its item again after the app or the phone restarts and after a web page loads again, and scrolls a list to an item that isn't on screen. When it can't tell its item apart from another, it focuses neither. Markers keep the text of the items they mark, never typed text or password fields, and stay out of settings backups. **Place markers** in SandFly settings, and the **Manage place markers** command, list the markers of every screen to delete them. **Go to last spot** moves back to where you were before you jumped to a marker.
+
 ### Container navigation
 
 **Next container** and **Previous container**, a four-finger swipe right or left by default, and the **Containers** reading control also stop at toolbars, tab bars, navigation bars, search bars and panes, besides lists, grids and scroll views. A bar inside a bar, such as a search bar in a toolbar, is one stop. **Previous container** moves to the start of the container, as **Next container** does, not to its last item, except in web content.

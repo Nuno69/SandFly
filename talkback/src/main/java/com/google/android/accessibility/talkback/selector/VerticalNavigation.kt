@@ -27,7 +27,6 @@ import com.google.android.accessibility.talkback.Pipeline
 import com.google.android.accessibility.talkback.R
 import com.google.android.accessibility.talkback.focusmanagement.AccessibilityFocusMonitor
 import com.google.android.accessibility.talkback.focusmanagement.NavigationTarget
-import com.google.android.accessibility.talkback.focusmanagement.record.FocusActionInfo
 import com.google.android.accessibility.utils.AccessibilityNodeInfoUtils
 import com.google.android.accessibility.utils.Filter
 import com.google.android.accessibility.utils.Performance.EventId
@@ -51,10 +50,12 @@ class VerticalNavigator(
   private val focusMonitor: AccessibilityFocusMonitor,
 ) {
   private val handler = Handler(Looper.getMainLooper())
+  private val focuser = ItemFocuser(pipeline)
 
   /** Moves down, or up. Plays the end sound when there is no item to move to. */
   fun move(eventId: EventId?, forward: Boolean) {
     handler.removeCallbacksAndMessages(null)
+    focuser.cancel()
     val focus = focusMonitor.getAccessibilityFocus(/* useInputFocusIfEmpty= */ false)
     if (focus == null) {
       pipeline.returnFeedback(eventId, Feedback.focusTop(INPUT_MODE_TOUCH))
@@ -63,7 +64,7 @@ class VerticalNavigator(
     val list = VerticalNavigation.listOf(focus)
     if (list != null) {
       VerticalNavigation.target(focus, forward, list)?.let {
-        focus(eventId, it)
+        focuser.focus(eventId, it)
         return
       }
       if (scroll(eventId, list, forward)) {
@@ -75,7 +76,7 @@ class VerticalNavigator(
     // At the end of the list, or outside one: the next item below or above on screen.
     val target = VerticalNavigation.target(focus, forward)
     if (target != null) {
-      focus(eventId, target)
+      focuser.focus(eventId, target)
     } else {
       pipeline.returnFeedback(eventId, Feedback.sound(R.raw.complete))
     }
@@ -84,6 +85,7 @@ class VerticalNavigator(
   /** Stops a move waiting for a list to scroll, such as when the user touches the screen. */
   fun cancel() {
     handler.removeCallbacksAndMessages(null)
+    focuser.cancel()
   }
 
   private fun scroll(eventId: EventId?, list: AccessibilityNodeInfoCompat, forward: Boolean): Boolean {
@@ -124,54 +126,10 @@ class VerticalNavigator(
       if (stillShown) VerticalNavigation.target(focus, forward, list)
       else VerticalNavigation.edgeRow(list, first = forward)
     if (target != null) {
-      focus(eventId, target)
+      focuser.focus(eventId, target)
     } else {
       pipeline.returnFeedback(eventId, Feedback.sound(R.raw.complete))
     }
-  }
-
-  /**
-   * Focuses [target], first scrolling it wholly into view when part of it is off screen, as a swipe
-   * does: parts that are off screen aren't spoken, so a row half under a toolbar would be read
-   * without its title.
-   */
-  private fun focus(eventId: EventId?, target: AccessibilityNodeInfoCompat) {
-    val list = VerticalNavigation.listOf(target)
-    if (list != null &&
-        hasPartOffScreen(target) &&
-        // Recorded as SandFly's own scroll, so it isn't taken for the user's and focus stays.
-        pipeline.returnFeedback(eventId, Feedback.scrollEnsureOnScreen(list, target))
-    ) {
-      handler.postDelayed(
-        {
-          if (target.refresh() && target.isVisibleToUser) {
-            focusNow(eventId, target)
-          } else {
-            pipeline.returnFeedback(eventId, Feedback.sound(R.raw.complete))
-          }
-        },
-        SHOW_ON_SCREEN_WAIT_MS,
-      )
-      return
-    }
-    focusNow(eventId, target)
-  }
-
-  private fun focusNow(eventId: EventId?, target: AccessibilityNodeInfoCompat) {
-    pipeline.returnFeedback(
-      eventId,
-      Feedback.focus(
-        target,
-        FocusActionInfo.builder().setSourceAction(FocusActionInfo.LOGICAL_NAVIGATION).build(),
-      ),
-    )
-  }
-
-  /** Whether the screen cuts off part of [node]: it is shown smaller than it is laid out. */
-  private fun hasPartOffScreen(node: AccessibilityNodeInfoCompat): Boolean {
-    val onScreen = Rect().also { node.getBoundsInScreen(it) }
-    val laidOut = Rect().also { node.getBoundsInParent(it) }
-    return onScreen.height() < laidOut.height() || onScreen.width() < laidOut.width()
   }
 
   private fun contentOf(node: AccessibilityNodeInfoCompat): String =
@@ -182,9 +140,6 @@ class VerticalNavigator(
 
     /** The time a list takes to scroll a page and lay it out. */
     const val SCROLL_WAIT_MS = 300L
-
-    /** The time a list takes to bring an item wholly into view. */
-    const val SHOW_ON_SCREEN_WAIT_MS = 150L
   }
 }
 

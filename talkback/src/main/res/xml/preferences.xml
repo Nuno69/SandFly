@@ -107,6 +107,10 @@
         android:targetClass="com.google.android.accessibility.talkback.labeling.LabelManagerSummaryActivity" />
   </com.google.android.accessibility.material.preference.AccessibilitySuitePreference>
   <com.google.android.accessibility.material.preference.AccessibilitySuitePreference
+      android:key="@string/pref_place_markers_key"
+      android:title="@string/title_place_markers"
+      android:fragment="com.google.android.accessibility.talkback.placemarkers.PlaceMarkersFragment" />
+  <com.google.android.accessibility.material.preference.AccessibilitySuitePreference
       android:fragment="com.google.android.accessibility.talkback.preference.base.QuickSettingsFragment"
       android:key="pref_quick_settings_screen"
       android:title="@string/title_pref_quick_settings_screen" />

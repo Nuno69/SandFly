@@ -41,6 +41,9 @@ class ScriptActivation(private val service: AccessibilityService) {
   val activity: String?
     get() = activePackage?.let(activityByPackage::get)
 
+  /** The activity last in front in [packageName], or null when none is known. */
+  fun activityOf(packageName: String): String? = activityByPackage[packageName]
+
   fun onWindowStateChanged(event: AccessibilityEvent) {
     val packageName = event.packageName?.toString() ?: return
     val className = event.className?.toString() ?: return

@@ -143,6 +143,7 @@ import com.google.android.accessibility.talkback.monitor.VolumeMonitor.VolumeCha
 import com.google.android.accessibility.talkback.notifications.NotificationReader;
 import com.google.android.accessibility.talkback.notifications.SpokenSchedules;
 import com.google.android.accessibility.talkback.quicksettings.TileCommands;
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerCommands;
 import com.google.android.accessibility.talkback.recognition.LiveRecognition;
 import com.google.android.accessibility.talkback.scripting.ItemInspector;
 import com.google.android.accessibility.talkback.scripting.ScriptCommands;
@@ -438,6 +439,7 @@ public class GestureController {
         || ReadingControlCommands.settingOf(action) != null
         || GestureProfiles.isAction(action)
         || VoiceProfileNames.isCommand(action)
+        || PlaceMarkerCommands.isCommand(action)
         || BrailleCommands.isAction(action);
   }
 
@@ -1671,6 +1673,8 @@ public class GestureController {
           eventId, ReadingControlCommands.settingOf(action), ReadingControlCommands.isNext(action));
     } else if (LiveRecognition.isCommand(action)) {
       result = LiveRecognition.runCommand(service, action);
+    } else if (PlaceMarkerCommands.isCommand(action)) {
+      result = selectorController.runPlaceMarkerCommand(eventId, action);
     } else if (action.equals(service.getString(R.string.shortcut_value_text_entities))) {
       result = menuManager.showMenu(TEXT_ENTITIES, eventId);
     } else if (action.equals(service.getString(R.string.shortcut_value_toggle_auto_translation))) {

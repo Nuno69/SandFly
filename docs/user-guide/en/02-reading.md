@@ -106,6 +106,7 @@ These reading controls move to the next or previous item of one kind. Swipe down
 - **Windows**: other windows on the screen, such as the volume controls or the navigation bar. Not in the list by default.
 - **Containers**: out of the current container to the next or previous one. Containers are lists, grids, scroll views, toolbars, tab bars, navigation bars, search bars and panes. A bar inside a bar, such as a search bar in a toolbar, counts as one. Going back moves to the start of the previous container, except on web pages. Not in the list by default.
 - **Vertical navigation**: the item below or above. See [](#reading-vertical).
+- **Place markers**: the items you marked on the screen. See [](#reading-place-markers). Not in the list by default.
 - **Screen search**: the results of the last screen search. See [](#reading-search).
 - **Scroll**: scrolls the list forward when you swipe down and back when you swipe up. When a list doesn't respond to scrolling, SandFly sends a swipe to the list instead. Not in the list by default.
 
@@ -201,6 +202,48 @@ Whether SandFly reads row and column numbers and column headers with each cell i
 The **Vertical navigation** reading control moves to the item below when you swipe down and the item above when you swipe up. It passes over the other items of the same row, such as the buttons beside the title of a video or the name of a file, and stays in the column of the focused item: from a key on a keypad, it moves to the key below or above. In a list, it stays in the list, and scrolls the list a page when there is no row below or above on the screen. At the end of the list, or outside a list, it moves to the item below or above on the screen, and plays the end sound when there is none.
 
 The **Move to item below** and **Move to item above** commands make the same moves from a gesture or keyboard shortcut, without the reading control. **Move to item on the left** and **Move to item on the right** move to the nearest item on the screen in that direction. None of them has a gesture by default.
+
+#### Place markers {#reading-place-markers}
+
+A place marker marks an item on a screen that you want to come back to, such as a heading on a web page, the message field of a chat, or one message. Each screen of an app has its own markers, numbered 1 to 10. On a web page in a browser, each page has its own.
+
+The commands are in the **Place markers** category. None has a gesture or keyboard shortcut by default.
+
+- **Set marker** marks the focused item with the first free number. When all 10 are used, it moves the marker you used longest ago and says which item it was on. On an item that already has a marker, it says its number.
+- **Set marker 1** to **Set marker 10** mark the focused item with that number. A marker that had the number moves to this item, and an item that had another marker gets the new number.
+- **Go to marker 1** to **Go to marker 10** move to the marker with that number.
+- **Next marker** and **Previous marker** move to the next or previous marker on the screen. In a list, they scroll to a marker further down or up when the list numbers its rows.
+- **Go to last spot** moves back to the item you were on before you jumped to a marker. See [](#reading-place-markers-last-spot).
+- **Delete marker** deletes the marker of the focused item, and **Delete all markers on this screen** deletes the screen's markers.
+- **Manage place markers** lists the markers of every screen, to delete them. See [](#reading-place-markers-manage).
+
+The **Place markers** reading control moves to the next marker when you swipe down and the previous one when you swipe up, in the order of the screen, and plays the end sound when there is no other. Turn it on in **Reading controls**.
+
+Markers are kept when the app or the phone restarts. SandFly finds a marker's item again by its place on the screen and its text, so it is found after the screen turns or the phone unfolds, and after a web page loads again, as long as the item and the items around it are the same. When the item is in a list and isn't on the screen, SandFly scrolls the list to it, playing a quiet sound for each page: near the row the item was at when the list numbers its rows, otherwise through the whole list. Touch the screen or press a key to stop. When the item isn't there, SandFly says that the marker isn't found, takes the list back to where it was, and leaves the marker and focus as they were. SandFly never moves to an item it isn't sure of: a message with the same text in another chat isn't taken for the marked one, and when two items match equally, neither is focused.
+
+Markers keep the text of the items they mark, but not what is typed in text fields or anything of password fields. They aren't included in settings backups or settings profiles, and can't be used while the phone is locked. Right after SandFly starts, an app's screen is known only once the app changes windows, and in a browser a page is known only when the address bar shows its address. Until then, SandFly says **Screen unknown** when you set or delete a marker.
+
+#### Manage place markers {#reading-place-markers-manage}
+
+**Place markers**, in SandFly settings, lists the screens that have markers. The **Manage place markers** command, in the **Place markers** category, opens the same list with the screen it was run on first, named **This screen**. The other screens follow, the one used most recently first. Each screen shows the name of its app, the name of the screen and its number of markers. The name of the screen is the title of its window, or of the page in a browser, when a marker was last set on it. Without a title, it is the name of the app's screen, such as **Conversation**, or **Page** in a browser.
+
+- Double-tap a screen to list its markers, with the number and the text of each. A marker on an item without text shows its role, such as **Button**.
+- Double-tap a marker and choose **Delete marker** to delete it. **Delete marker** is also in the **Actions** of each marker.
+- **Delete all markers on this screen** deletes the markers of a screen. It is at the end of the screen's markers and in the **Actions** of each screen in the list.
+- **Delete all markers**, at the end of the list, deletes the markers of every screen after you confirm.
+
+The list can't be opened while the phone is locked.
+
+#### Go to last spot {#reading-place-markers-last-spot}
+
+The last spot is the item you were on when you jumped to a marker with **Go to marker**, **Next marker**, **Previous marker** or the **Place markers** reading control. **Go to last spot**, in the **Place markers** category, moves back to it.
+
+- Jumping on from the marker to another keeps the last spot, so **Go to last spot** takes you back to where you started.
+- Going back makes the item you leave the last spot, so running the command again takes you back to the marker.
+- There is one last spot, on the screen of the last jump. On another screen, SandFly says **No last spot on this screen**.
+- SandFly finds the last spot like a marker, scrolling a list to it. When it isn't there, SandFly says **Last spot not found** and leaves focus where it is.
+
+The last spot isn't saved, and is forgotten when SandFly turns off.
 
 ### Focus when the screen changes {#reading-screen-changes}
 

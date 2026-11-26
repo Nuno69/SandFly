@@ -33,6 +33,7 @@ import com.google.android.accessibility.talkback.gesture.OpenAppActions
 import com.google.android.accessibility.talkback.keyboard.TalkBackPhysicalKeyboardShortcut
 import com.google.android.accessibility.talkback.keyboard.TalkBackPhysicalKeyboardShortcut as Key
 import com.google.android.accessibility.talkback.macros.Macros
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerCommands
 import com.google.android.accessibility.talkback.quicksettings.TileCommands
 import com.google.android.accessibility.talkback.recognition.LiveRecognition
 import com.google.android.accessibility.talkback.recognition.RecognitionMode
@@ -335,6 +336,7 @@ object Commands {
       textNavigation()
       elementNavigation()
       tables()
+      placeMarkers()
       web()
       reading()
       screenReview()
@@ -1159,6 +1161,13 @@ object Commands {
             commands.add(Command(value, label, null))
           }
         }
+      }
+
+    private fun placeMarkers() =
+      category(R.string.title_place_markers) {
+        // Watches have no Place markers reading control, and don't know which activity is shown.
+        if (wear) return@category
+        commands.addAll(PlaceMarkerCommands.commands(context))
       }
 
     private fun liveRecognition() =

@@ -190,6 +190,8 @@ class LazyScriptHost(
 
   override fun currentActivity(): String? = manager?.currentActivity()
 
+  override fun activityOf(packageName: String): String? = activation.activityOf(packageName)
+
   override fun currentWindowTitle(): String? = manager?.currentWindowTitle()
 
   override fun onGesture(name: String, fallback: Runnable): Boolean =

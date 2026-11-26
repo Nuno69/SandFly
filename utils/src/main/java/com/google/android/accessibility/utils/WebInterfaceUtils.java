@@ -19,6 +19,7 @@ package com.google.android.accessibility.utils;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Patterns;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.google.android.accessibility.utils.traversal.TraversalStrategy;
 import com.google.android.accessibility.utils.traversal.TraversalStrategy.SearchDirectionOrUnknown;
@@ -443,6 +444,33 @@ public class WebInterfaceUtils {
                 .contains(node.getViewIdResourceName());
           }
         });
+  }
+
+  /** Returns whether {@code packageName} is a browser whose address bar SandFly can read. */
+  public static boolean isBrowser(@Nullable CharSequence packageName) {
+    return packageName != null && URL_BAR_IDS.containsKey(packageName.toString());
+  }
+
+  /**
+   * Returns the address in the address bar of the browser window whose root is {@code root}, or null
+   * when it has no address bar or the bar shows no address, as on a new tab ("Search or type a
+   * URL"). Asks the browser for each of its address bar IDs, which is quicker than searching its
+   * tree.
+   */
+  public static @Nullable CharSequence currentUrl(@Nullable AccessibilityNodeInfoCompat root) {
+    @Nullable CharSequence packageName = (root == null) ? null : root.getPackageName();
+    if (packageName == null) {
+      return null;
+    }
+    for (String id : URL_BAR_IDS.getOrDefault(packageName.toString(), ImmutableList.of())) {
+      for (AccessibilityNodeInfoCompat bar : AccessibilityNodeInfoUtils.findNodesByViewId(root, id)) {
+        @Nullable CharSequence url = bar.getText();
+        if (url != null && Patterns.WEB_URL.matcher(url).matches()) {
+          return url;
+        }
+      }
+    }
+    return null;
   }
 
   private static boolean isNodeFromFirefox(AccessibilityNodeInfoCompat node) {

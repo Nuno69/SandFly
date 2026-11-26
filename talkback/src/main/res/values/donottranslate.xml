@@ -680,6 +680,8 @@
     <string name="pref_selector_equalizer_16k_key" translatable="false">pref_selector_equalizer_16k_key</string>
     <string name="pref_selector_auto_translation_key" translatable="false">pref_selector_auto_translation_key</string>
     <string name="pref_selector_vertical_navigation_key" translatable="false">pref_selector_vertical_navigation_key</string>
+    <string name="pref_selector_place_markers_key" translatable="false">pref_selector_place_markers_key</string>
+    <string name="pref_place_markers_key" translatable="false">pref_place_markers_screen</string>
     <string name="pref_selector_voice_profile_key" translatable="false">pref_selector_voice_profile_key</string>
     <string name="pref_selector_gesture_profile_key" translatable="false">pref_selector_gesture_profile_key</string>
     <string name="pref_selector_voice_profile_moved_key" translatable="false">pref_selector_voice_profile_moved</string>
@@ -3403,6 +3405,7 @@
     <bool name="pref_selector_equalizer_default">false</bool>
     <bool name="pref_selector_auto_translation_default">false</bool>
     <bool name="pref_selector_vertical_navigation_default">false</bool>
+    <bool name="pref_selector_place_markers_default">false</bool>
     <bool name="pref_selector_voice_profile_default">false</bool>
     <bool name="pref_selector_gesture_profile_default">true</bool>
     <bool name="pref_selector_touch_focus_latency_default">false</bool>
@@ -4185,6 +4188,7 @@
     <string name="selector_equalizer_16k" translatable="false">SELECTOR_EQUALIZER_16K</string>
     <string name="selector_auto_translation" translatable="false">SELECTOR_AUTO_TRANSLATION</string>
     <string name="selector_vertical_navigation" translatable="false">SELECTOR_VERTICAL_NAVIGATION</string>
+    <string name="selector_place_markers" translatable="false">SELECTOR_PLACE_MARKERS</string>
     <string name="selector_voice_profile" translatable="false">SELECTOR_VOICE_PROFILE</string>
     <string name="selector_gesture_profile" translatable="false">SELECTOR_GESTURE_PROFILE</string>
     <string name="selector_touch_focus_latency_change" translatable="false">SELECTOR_TOUCH_FOCUS_LATENCY_CHANGE</string>

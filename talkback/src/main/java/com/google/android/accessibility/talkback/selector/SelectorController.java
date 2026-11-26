@@ -84,6 +84,8 @@ import com.google.android.accessibility.talkback.Feedback.TalkBackUI.Item;
 import com.google.android.accessibility.talkback.Interpretation;
 import com.google.android.accessibility.talkback.Pipeline;
 import com.google.android.accessibility.talkback.R;
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerCommands;
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerNavigator;
 import com.google.android.accessibility.talkback.TalkBackService;
 import com.google.android.accessibility.talkback.clipboard.ClipboardHistoryOverlay;
 import com.google.android.accessibility.talkback.gesture.GestureLayout;
@@ -501,6 +503,10 @@ public class SelectorController implements UserInputEventListener {
         R.string.pref_selector_vertical_navigation_key,
         R.string.selector_vertical_navigation,
         R.bool.pref_selector_vertical_navigation_default),
+    PLACE_MARKERS(
+        R.string.pref_selector_place_markers_key,
+        R.string.selector_place_markers,
+        R.bool.pref_selector_place_markers_default),
     SPEECH_STREAM(
         R.string.pref_selector_speech_stream_key,
         R.string.selector_speech_stream,
@@ -753,6 +759,7 @@ public class SelectorController implements UserInputEventListener {
   private final AccessibilityFocusMonitor accessibilityFocusMonitor;
   private final Pipeline.FeedbackReturner pipeline;
   private final VerticalNavigator verticalNavigator;
+  private final @Nullable PlaceMarkerNavigator placeMarkers;
   private final @Nullable PageScroller pageScroller;
   private final ActorState actorState;
   private final NodeMenuRuleCreator nodeMenuCreator;
@@ -812,6 +819,7 @@ public class SelectorController implements UserInputEventListener {
           Setting.GRANULARITY_SEARCH,
           Setting.GRANULARITY_DEFAULT,
           Setting.VERTICAL_NAVIGATION,
+          Setting.PLACE_MARKERS,
           // TODO Supports special content.
           Setting.SPEECH_RATE,
           Setting.PUNCTUATION,
@@ -949,9 +957,15 @@ public class SelectorController implements UserInputEventListener {
     this.actorState = actorState;
     this.accessibilityFocusMonitor = accessibilityFocusMonitor;
     verticalNavigator = new VerticalNavigator(pipeline, accessibilityFocusMonitor);
+    AccessibilityService accessibilityService =
+        context instanceof AccessibilityService service ? service : null;
     pageScroller =
-        context instanceof AccessibilityService accessibilityService
+        accessibilityService != null
             ? new PageScroller(accessibilityService, pipeline, accessibilityFocusMonitor)
+            : null;
+    placeMarkers =
+        accessibilityService != null
+            ? new PlaceMarkerNavigator(accessibilityService, pipeline, accessibilityFocusMonitor)
             : null;
     this.nodeMenuCreator = nodeMenuCreator;
     this.analytics = analytics;
@@ -978,6 +992,8 @@ public class SelectorController implements UserInputEventListener {
       hiddenSettingsBuilder.add(Setting.SPEAK_USER_FOCUS);
       // Nor image and screen descriptions.
       hiddenSettingsBuilder.add(Setting.AI_SERVICE);
+      // Nor place markers: watches don't know which activity is shown.
+      hiddenSettingsBuilder.add(Setting.PLACE_MARKERS);
     } else if (!FeatureSupport.doesServiceHandleDoubleTap()) {
       hiddenSettingsBuilder.add(ACTIONS);
       hiddenSettingsBuilder.add(Setting.LIVE_RECOGNITION);
@@ -1282,6 +1298,10 @@ public class SelectorController implements UserInputEventListener {
       }
       case VERTICAL_NAVIGATION -> {
         actionDescription = context.getString(R.string.title_selector_vertical_navigation);
+        hint = getAdjustSelectedSettingGestures();
+      }
+      case PLACE_MARKERS -> {
+        actionDescription = context.getString(R.string.title_place_markers);
         hint = getAdjustSelectedSettingGestures();
       }
       case SWITCH_VOICE_PROFILE -> {
@@ -1840,6 +1860,9 @@ public class SelectorController implements UserInputEventListener {
   public void shutdown() {
     handler.removeCallbacks(switchAfterTouch);
     cancelPageScroll();
+    if (placeMarkers != null) {
+      placeMarkers.shutdown();
+    }
     lastFocusedNode = null;
     chosenTextEntity = null;
     clipboardHistorySetting.reset();
@@ -2377,6 +2400,10 @@ public class SelectorController implements UserInputEventListener {
       }
       case LIVE_RECOGNITION -> {
         return LiveRecognition.isSupported(context) && FeatureSupport.doesServiceHandleDoubleTap();
+      }
+      case PLACE_MARKERS -> {
+        // Markers hold the text of items in apps, which isn't read while the device is locked.
+        return placeMarkers != null && !ScreenMonitor.isDeviceLocked(context);
       }
       case AI_ACTIONS -> {
         return FeatureSupport.doesServiceHandleDoubleTap()
@@ -3021,6 +3048,12 @@ public class SelectorController implements UserInputEventListener {
         moveVertically(eventId, isNext);
         return;
       }
+      case PLACE_MARKERS -> {
+        if (placeMarkers != null) {
+          placeMarkers.move(eventId, isNext);
+        }
+        return;
+      }
       case SWITCH_VOICE_PROFILE -> {
         changeVoiceProfile(eventId, isNext, getAdjustSelectedSettingGestures());
         return;
@@ -3397,6 +3430,26 @@ public class SelectorController implements UserInputEventListener {
    */
   public void moveVertically(EventId eventId, boolean isNext) {
     verticalNavigator.move(eventId, isNext);
+  }
+
+  /**
+   * Runs the place marker command saved as {@code value}, which says what it did. Returns false
+   * when markers can't be used here.
+   */
+  public boolean runPlaceMarkerCommand(EventId eventId, String value) {
+    PlaceMarkerCommands.Command command = PlaceMarkerCommands.parse(value);
+    if (placeMarkers == null || command == null) {
+      return false;
+    }
+    placeMarkers.run(eventId, command);
+    return true;
+  }
+
+  /** Stops a place marker command still looking for its item, such as when the user takes over. */
+  public void cancelPlaceMarkers() {
+    if (placeMarkers != null) {
+      placeMarkers.cancelPending();
+    }
   }
 
   /** Changes the volume speech and sounds play at to the next or previous of the four. */

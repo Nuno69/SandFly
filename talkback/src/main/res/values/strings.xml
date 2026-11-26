@@ -65,6 +65,82 @@
     <string name="title_selector_vertical_navigation">Vertical navigation</string>
     <!-- Summary of the Vertical navigation reading control in the reading controls settings. [CHAR LIMIT=NONE] -->
     <string name="summary_selector_vertical_navigation">Move to the item below or above, past the other items of the row</string>
+    <!-- Title of the place markers: the command category, the reading control that moves to the next or previous marker on the screen, and the settings screen that lists the markers of every screen. A marker marks an item on a screen that the user wants to come back to. [CHAR LIMIT=40] -->
+    <string name="title_place_markers">Place markers</string>
+    <!-- Summary of the Place markers reading control in the reading controls settings. [CHAR LIMIT=NONE] -->
+    <string name="summary_selector_place_markers">Move to the next or previous marker on the screen</string>
+    <!-- Name of the command that moves to the place marker with a number, 1 to 10, on the screen. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_go_to_place_marker">Go to marker <xliff:g id="number" example="3">%1$d</xliff:g></string>
+    <!-- Name of the command that sets the place marker with a number, 1 to 10, on the focused item. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_set_place_marker_number">Set marker <xliff:g id="number" example="3">%1$d</xliff:g></string>
+    <!-- Name of the command that moves to the next place marker on the screen. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_next_place_marker">Next marker</string>
+    <!-- Name of the command that moves to the previous place marker on the screen. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_previous_place_marker">Previous marker</string>
+    <!-- Name of the command that sets the first free place marker of the screen on the focused item, or else the marker used longest ago. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_set_place_marker">Set marker</string>
+    <!-- Name of the command that deletes the place marker of the focused item, and of the action that deletes a marker in the list of markers. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_delete_place_marker">Delete marker</string>
+    <!-- Name of the command that deletes every place marker of the screen, and of the action that deletes the markers of a screen in the list of markers. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_delete_screen_place_markers">Delete all markers on this screen</string>
+    <!-- Spoken when the focused item gets a place marker that no other item had. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_set">Marker <xliff:g id="number" example="3">%1$d</xliff:g> set</string>
+    <!-- Spoken when the focused item already has the place marker that was set, and the title of a marker in the list of the markers of a screen. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_number">Marker <xliff:g id="number" example="3">%1$d</xliff:g></string>
+    <!-- Spoken when the place marker of the focused item gets another number. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_renumbered">Marker <xliff:g id="old_number" example="2">%1$d</xliff:g> is now marker <xliff:g id="new_number" example="5">%2$d</xliff:g></string>
+    <!-- Spoken when a place marker moves to the focused item from another item, whose text follows. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_moved_here_from">Marker <xliff:g id="number" example="3">%1$d</xliff:g> moved here from <xliff:g id="item" example="Inbox">%2$s</xliff:g></string>
+    <!-- Spoken when a place marker moves to the focused item from another item with no text. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_moved_here">Marker <xliff:g id="number" example="3">%1$d</xliff:g> moved here</string>
+    <!-- Spoken when the item of a place marker isn't found on the screen. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_not_found">Marker <xliff:g id="number" example="3">%1$d</xliff:g> not found</string>
+    <!-- Spoken when the screen has no place marker with the number asked for. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_none_numbered">No marker <xliff:g id="number" example="3">%1$d</xliff:g> on this screen</string>
+    <!-- Spoken when the screen has no place markers. [CHAR LIMIT=NONE] -->
+    <string name="place_markers_none">No markers on this screen</string>
+    <!-- Spoken when the screen has place markers, but none of their items is found. [CHAR LIMIT=NONE] -->
+    <string name="place_markers_not_found">No markers found on this screen</string>
+    <!-- Spoken when a place marker can't be set or deleted because SandFly doesn't know yet which screen of the app is shown. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_screen_unknown">Screen unknown</string>
+    <!-- Spoken when the place marker of the focused item is deleted. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_deleted">Marker <xliff:g id="number" example="3">%1$d</xliff:g> deleted</string>
+    <!-- Spoken when the focused item has no place marker to delete. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_none_here">No marker here</string>
+    <!-- Spoken when the place markers can't be used because the device is locked. [CHAR LIMIT=NONE] -->
+    <string name="place_markers_locked">Unlock the device to use markers</string>
+    <!-- Spoken when the place markers of a screen, or of every screen, are deleted, with their number. [CHAR LIMIT=NONE] -->
+    <plurals name="place_markers_deleted">
+        <item quantity="one"><xliff:g id="count" example="1">%1$d</xliff:g> marker deleted</item>
+        <item quantity="other"><xliff:g id="count" example="3">%1$d</xliff:g> markers deleted</item>
+    </plurals>
+    <!-- Name of the command that opens the list of the place markers of every screen, to delete them. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_manage_place_markers">Manage place markers</string>
+    <!-- In the list of place markers, said in place of the name of the screen the list was opened from. [CHAR LIMIT=40] -->
+    <string name="place_markers_this_screen">This screen</string>
+    <!-- In the list of place markers, the summary of a screen under the name of its app: the name of the screen, such as Conversation, or "This screen", and its number of markers. [CHAR LIMIT=NONE] -->
+    <plurals name="place_markers_screen_summary">
+        <item quantity="one"><xliff:g id="screen" example="Conversation">%1$s</xliff:g>, <xliff:g id="count" example="1">%2$d</xliff:g> marker</item>
+        <item quantity="other"><xliff:g id="screen" example="Conversation">%1$s</xliff:g>, <xliff:g id="count" example="3">%2$d</xliff:g> markers</item>
+    </plurals>
+    <!-- In the list of place markers, the name of a web page in a browser whose title isn't known. [CHAR LIMIT=40] -->
+    <string name="place_markers_page">Page</string>
+    <!-- In the list of the place markers of a screen, said of a marked item that has no text and no role. [CHAR LIMIT=40] -->
+    <string name="place_marker_no_text">No text</string>
+    <!-- The last row of the list of place markers, which deletes the markers of every screen. [CHAR LIMIT=NONE] -->
+    <string name="place_markers_delete_all">Delete all markers</string>
+    <!-- Title of the dialog that asks before deleting the place markers of every screen. [CHAR LIMIT=NONE] -->
+    <string name="place_markers_delete_all_title">Delete all markers on every screen?</string>
+    <!-- Button of the dialog that deletes the place markers of every screen. [CHAR LIMIT=20] -->
+    <string name="place_markers_delete">Delete</string>
+    <!-- Shown in the list of place markers when no screen has any. [CHAR LIMIT=NONE] -->
+    <string name="place_markers_empty">No markers</string>
+    <!-- Name of the command that moves back to the item that had focus before it jumped to a place marker. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_go_to_last_spot">Go to last spot</string>
+    <!-- Spoken when focus hasn't jumped to a place marker on the screen, so there is no item to move back to. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_no_last_spot">No last spot on this screen</string>
+    <!-- Spoken when the item that had focus before it jumped to a place marker isn't found on the screen. [CHAR LIMIT=NONE] -->
+    <string name="place_marker_last_spot_not_found">Last spot not found</string>
     <!-- Title for the "switch TTS engine" reading control selector item. [CHAR LIMIT=NONE] -->
     <string name="title_selector_switch_tts_engine">Speech engine</string>
     <!-- Summary for the "switch TTS engine" reading control selector item. [CHAR LIMIT=NONE] -->

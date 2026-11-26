@@ -229,6 +229,7 @@ import com.google.android.accessibility.talkback.gesture.KeyboardHover;
 import com.google.android.accessibility.talkback.gesture.PowerCommands;
 import com.google.android.accessibility.talkback.gesture.SyntheticTouches;
 import com.google.android.accessibility.talkback.gesture.TextTraversalTracker;
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerNavigator;
 import com.google.android.accessibility.talkback.touchlock.TouchLock;
 import com.google.android.accessibility.talkback.gesture.TwoFingerRotationTracker;
 import com.google.android.accessibility.talkback.gesture.VibrationWatchGestureSettings;
@@ -1555,6 +1556,7 @@ public class TalkBackService extends AccessibilityServiceCompat
       clearCache();
     }
     TraversalTreeCache.onAccessibilityEvent(event);
+    PlaceMarkerNavigator.onAccessibilityEvent(event);
     PreparedFocusSpeech.onAccessibilityEvent(event);
     if (directTouchController != null) {
       directTouchController.onAccessibilityEvent(event);
@@ -1578,6 +1580,10 @@ public class TalkBackService extends AccessibilityServiceCompat
         && gestureController != null
         && !touchLocked) {
       gestureController.onUserInputStarted();
+      // A touch stops a place marker search where it is.
+      if (selectorController != null) {
+        selectorController.cancelPlaceMarkers();
+      }
     }
     if (eventType == AccessibilityEvent.TYPE_TOUCH_INTERACTION_START) {
       // TODO: Could move the logic of TOUCH_INTERACTION related event handling out of
@@ -1915,6 +1921,11 @@ public class TalkBackService extends AccessibilityServiceCompat
       // Repeats of a held key, such as the one that started the collection, don't end it.
       if (keyEvent.getRepeatCount() == 0) {
         stopContinuousCopy();
+        // A key pressed stops a place marker search where it is; the repeats of a held key, such as
+        // the one of the shortcut that started it, don't.
+        if (selectorController != null) {
+          selectorController.cancelPlaceMarkers();
+        }
         if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && focuser != null) {
           focuser.onBack();
         }

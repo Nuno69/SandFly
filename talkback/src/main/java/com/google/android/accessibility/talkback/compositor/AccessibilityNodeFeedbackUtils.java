@@ -330,7 +330,12 @@ public class AccessibilityNodeFeedbackUtils {
    * <p>Note: The content should be non-copyable text for "copy last spoken phrase"
    */
   public static CharSequence getNodeRoleName(AccessibilityNodeInfoCompat node, Context context) {
-    int role = Role.getRole(node);
+    CharSequence roleName = getRoleName(Role.getRole(node), context);
+    return roleName.length() == 0 ? "" : SpannableUtils.wrapWithNonCopyableTextSpan(roleName);
+  }
+
+  /** Returns the name of {@code role}, such as "Button", or an empty text for a role without one. */
+  public static CharSequence getRoleName(@Role.RoleName int role, Context context) {
     CharSequence roleName = "";
     switch (role) {
       case Role.ROLE_BUTTON,
@@ -358,8 +363,7 @@ public class AccessibilityNodeFeedbackUtils {
         return "";
       }
     }
-
-    return SpannableUtils.wrapWithNonCopyableTextSpan(roleName);
+    return roleName;
   }
 
   /**

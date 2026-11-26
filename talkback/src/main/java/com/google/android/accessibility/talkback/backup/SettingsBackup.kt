@@ -36,6 +36,7 @@ import com.google.android.accessibility.talkback.gesture.AppShortcutActions
 import com.google.android.accessibility.talkback.labeling.LabelBackup
 import com.google.android.accessibility.talkback.monitor.ScreenAnnouncementSettings
 import com.google.android.accessibility.talkback.migration.MigrationFiles
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerStore
 import com.google.android.accessibility.talkback.quicksettings.SystemTiles
 import com.google.android.accessibility.talkback.scripting.ScriptHostFactory
 import com.google.android.accessibility.talkback.soundthemes.SoundThemes
@@ -101,7 +102,13 @@ object SettingsBackup {
   @VisibleForTesting const val PRO_PREFS = "sandfly_ai"
 
   private val SKIPPED_FILES =
-    setOf(MigrationFiles.STATE_PREFS, PRO_PREFS, AppShortcutActions.LISTED_PREFS, NotUnderstoodPhrases.PREFS)
+    setOf(
+      MigrationFiles.STATE_PREFS,
+      PRO_PREFS,
+      AppShortcutActions.LISTED_PREFS,
+      NotUnderstoodPhrases.PREFS,
+      PlaceMarkerStore.FILE,
+    )
 
   /** Files of libraries, such as Google Play services and WebView, which hold their own state. */
   private val LIBRARY_PREFIXES = listOf("com.google.", "androidx.", "WebView", "Firebase")

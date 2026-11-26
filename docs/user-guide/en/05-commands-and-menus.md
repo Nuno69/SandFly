@@ -21,6 +21,7 @@ The list holds only the commands that the device supports. For example, commands
 - **Scrolling**: scroll forward, back, up, down, left and right, to the top and to the bottom, and **Refresh**.
 - **Navigate by text** and **Navigate by element**: next and previous character, word, line, sentence, paragraph, heading, link, control, button, list, table, landmark and other kinds of item.
 - **Tables**: next and previous row and column, the start and end of rows, columns and tables, and row and column headers.
+- **Place markers**: next and previous marker, **Go to last spot**, **Set marker**, **Delete marker**, **Delete all markers on this screen**, **Manage place markers**, and **Go to marker** and **Set marker** for each number from 1 to 10. See [](#reading-place-markers).
 - **Web**: **Turn browse mode on or off**, lists of headings, landmarks, links, controls and tables, and the address of a link or page. See [](#web).
 - **Reading**: **Read from top**, **Read from focused item**, **Read from focused item by reading control**, repeat, spell and translate the last spoken phrase, **Speech history**, **Speak status**, **Speak position**, **Speak coordinates**, the date and time, the battery level, **Say caller** and the window title.
 - **Speech**: **Pause or resume speech**, **Turn speech on or off**, speech rate, pitch and volume, spoken language, voice profiles, punctuation, keyboard echo, **Use voice effects**, **Audio ducking** and **Vibration feedback**.
@@ -190,7 +191,7 @@ When you change the reading control or its value with a gesture, SandFly also sh
 #### Reading controls you can add {#commands-reading-control-groups}
 
 - **Actions for current item**: **Actions**, **Addresses and numbers**, **Clipboard history**, **Word suggestions**, which moves through the suggestions for the word typed with the SandFly keyboard, and **Proofread**, which moves between spelling and grammar suggestions. See [](#keyboards-word-suggestions). With **Actions** selected, swipe up or down to choose a command for the focused item, then double-tap to run it. Apps can offer commands such as **Reply** or **Archive**.
-- **Basic navigation**: **Default navigation**, **Windows**, **Containers**, **Screen search**, **Vertical navigation**, **Scroll** and **Wrap around**.
+- **Basic navigation**: **Default navigation**, **Windows**, **Containers**, **Screen search**, **Vertical navigation**, **Place markers**, **Scroll** and **Wrap around**.
 - **Navigate by text**: **Characters**, **Words**, **Lines**, **Sentences** and **Paragraphs**.
 - **Element navigation**: **Headings**, **Links**, **Controls**, **Landmarks**, **Buttons**, **Checkboxes**, **Radio buttons**, **Edit fields**, **Combo boxes**, **Focusable items**, **Images and videos**, **Lists**, **List items**, **Tables**, **Visited links** and **Unvisited links**.
 - **Heading levels**: **Heading 1** to **Heading 6**.

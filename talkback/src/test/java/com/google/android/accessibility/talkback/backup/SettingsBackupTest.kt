@@ -17,6 +17,7 @@
 package com.google.android.accessibility.talkback.backup
 
 import android.content.Context
+import com.google.android.accessibility.talkback.placemarkers.PlaceMarkerStore
 import com.google.android.accessibility.talkback.quicksettings.SystemTiles
 import com.google.android.accessibility.utils.SharedPreferencesUtils
 import org.junit.Assert.assertEquals
@@ -130,6 +131,24 @@ class SettingsBackupTest {
     assertTrue(SettingsBackup.import(context, other))
     assertEquals("second", pro.getString("device_id", null))
     assertEquals("second-licence", pro.getString("licence", null))
+  }
+
+  @Test
+  fun placeMarkersStayOnThePhone() {
+    val markers = context.getSharedPreferences(PlaceMarkerStore.FILE, Context.MODE_PRIVATE)
+    markers.edit().putString("screens", "a private message").commit()
+    val json = SettingsBackup.export(context)
+    assertFalse(json.contains("private message"))
+    assertFalse(json.contains(PlaceMarkerStore.FILE))
+
+    val other =
+      """
+      {"format": "sandfly-settings", "version": 1, "files": {"place_markers": {
+        "screens": {"type": "string", "value": "from another phone"}
+      }}}
+      """
+    SettingsBackup.import(context, other)
+    assertEquals("a private message", markers.getString("screens", null))
   }
 
   @Test

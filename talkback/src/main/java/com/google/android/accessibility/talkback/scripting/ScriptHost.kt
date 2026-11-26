@@ -40,6 +40,12 @@ interface ScriptHost {
 
   fun currentActivity(): String?
 
+  /**
+   * Returns the activity last in front in the app [packageName], from its window changes, or null
+   * when none is known. Known whether or not scripts run.
+   */
+  fun activityOf(packageName: String): String? = null
+
   fun currentWindowTitle(): String?
 
   fun onPausedChanged(paused: Boolean)
@@ -249,6 +255,8 @@ object Scripts {
     node?.let { rule(it, RuleAspect.LIFT) }?.takeIf { it.liftToActivate }?.longPressAfter ?: 0
 
   @JvmStatic fun currentActivity(): String? = host?.currentActivity()
+
+  @JvmStatic fun activityOf(packageName: String): String? = host?.activityOf(packageName)
 
   @JvmStatic fun currentWindowTitle(): String? = host?.currentWindowTitle()
 
