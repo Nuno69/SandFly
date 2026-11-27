@@ -228,6 +228,7 @@
     <string name="pref_typing_confirmation_key" translatable="false">pref_typing_confirmation</string>
     <string name="pref_typing_long_press_duration_key" translatable="false">pref_typing_long_press_duration</string>
     <string name="pref_typing_hold_keys_down_key" translatable="false">pref_typing_hold_keys_down</string>
+    <string name="pref_typing_swipes_through_keys_key" translatable="false">pref_typing_swipes_through_keys</string>
     <string name="pref_keypad_letter_keys_key" translatable="false">pref_keypad_letter_keys</string>
     <string name="pref_enter_sends_messages_key" translatable="false">pref_enter_sends_messages</string>
     <string name="pref_sandfly_keyboard_key" translatable="false">pref_sandfly_keyboard</string>
@@ -238,6 +239,84 @@
     <bool name="pref_sandfly_keyboard_double_space_period_default">false</bool>
     <string name="pref_speak_password_characters_key" translatable="false">pref_speak_password_characters</string>
     <bool name="pref_speak_password_characters_default">false</bool>
+    <string name="pref_sandfly_keyboard_autocorrect_key" translatable="false">pref_sandfly_keyboard_autocorrect</string>
+    <bool name="pref_sandfly_keyboard_autocorrect_default">false</bool>
+    <string name="pref_sandfly_keyboard_suggestions_key" translatable="false">pref_sandfly_keyboard_suggestions</string>
+    <bool name="pref_sandfly_keyboard_suggestions_default">false</bool>
+    <string name="pref_sandfly_keyboard_word_language_key" translatable="false">pref_sandfly_keyboard_word_language</string>
+    <string name="pref_sandfly_keyboard_word_language_default" translatable="false">system</string>
+    <string name="pref_sandfly_keyboard_suggestion_pause_key" translatable="false">pref_sandfly_keyboard_suggestion_pause</string>
+    <string name="pref_sandfly_keyboard_suggestion_pause_default" translatable="false">1000</string>
+    <!-- "immediately" must match WordInput.SPEAK_IMMEDIATELY; the others are milliseconds. -->
+    <string-array name="pref_sandfly_keyboard_suggestion_pause_values" translatable="false">
+        <item>0</item>
+        <item>immediately</item>
+        <item>250</item>
+        <item>500</item>
+        <item>750</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>3000</item>
+    </string-array>
+    <string-array name="pref_sandfly_keyboard_suggestion_pause_entries" translatable="false">
+        <item>@string/value_sandfly_keyboard_suggestion_pause_off</item>
+        <item>@string/value_sandfly_keyboard_suggestion_pause_immediately</item>
+        <item>@string/value_touch_explore_time_out_250ms</item>
+        <item>@string/value_handwriting_wait_500</item>
+        <item>@string/value_multi_tap_timeout_750ms</item>
+        <item>@string/value_handwriting_wait_1000</item>
+        <item>@string/value_two_stroke_swipe_time_1500</item>
+        <item>@string/value_typing_long_press_2000ms</item>
+        <item>@string/value_hold_to_cancel_3000</item>
+    </string-array>
+    <string name="pref_sandfly_keyboard_enter_types_suggestion_key" translatable="false">pref_sandfly_keyboard_enter_types_suggestion</string>
+    <bool name="pref_sandfly_keyboard_enter_types_suggestion_default">false</bool>
+    <string name="pref_sandfly_keyboard_delete_learned_words_key" translatable="false">pref_sandfly_keyboard_delete_learned_words</string>
+    <!-- Must match WordLanguage's codes; "system" is the system language. -->
+    <string-array name="pref_sandfly_keyboard_word_language_values" translatable="false">
+        <item>system</item>
+        <item>en_us</item>
+        <item>en_gb</item>
+        <item>de</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>pt_br</item>
+        <item>pt_pt</item>
+        <item>hu</item>
+        <item>tr</item>
+        <item>ru</item>
+        <item>uk</item>
+        <item>ar</item>
+    </string-array>
+    <!-- Each language's name in that language; the first entry is in strings.xml. -->
+    <string name="word_language_en_us" translatable="false">English (US)</string>
+    <string name="word_language_en_gb" translatable="false">English (UK)</string>
+    <string name="word_language_de" translatable="false">Deutsch</string>
+    <string name="word_language_es" translatable="false">Español</string>
+    <string name="word_language_fr" translatable="false">Français</string>
+    <string name="word_language_pt_br" translatable="false">Português (Brasil)</string>
+    <string name="word_language_pt_pt" translatable="false">Português (Portugal)</string>
+    <string name="word_language_hu" translatable="false">Magyar</string>
+    <string name="word_language_tr" translatable="false">Türkçe</string>
+    <string name="word_language_ru" translatable="false">Русский</string>
+    <string name="word_language_uk" translatable="false">Українська</string>
+    <string name="word_language_ar" translatable="false">العربية</string>
+    <string-array name="pref_sandfly_keyboard_word_language_entries" translatable="false">
+        <item>@string/value_word_language_system</item>
+        <item>@string/word_language_en_us</item>
+        <item>@string/word_language_en_gb</item>
+        <item>@string/word_language_de</item>
+        <item>@string/word_language_es</item>
+        <item>@string/word_language_fr</item>
+        <item>@string/word_language_pt_br</item>
+        <item>@string/word_language_pt_pt</item>
+        <item>@string/word_language_hu</item>
+        <item>@string/word_language_tr</item>
+        <item>@string/word_language_ru</item>
+        <item>@string/word_language_uk</item>
+        <item>@string/word_language_ar</item>
+    </string-array>
     <string-array name="pref_sandfly_keyboard_held_keys_values" translatable="false">
         <item>alt</item>
         <item>capital</item>
@@ -265,7 +344,6 @@
     <string name="pref_count_repeated_symbols_key" >pref_collapse_repeated_symbols</string>
     <string name="pref_emoji_speech_key" translatable="false">pref_emoji_speech</string>
     <string name="pref_emoji_repeat_count_key" translatable="false">pref_emoji_repeat_count</string>
-    <string name="pref_emoji_suffix_key" translatable="false">pref_emoji_suffix</string>
     <string name="pref_capital_letters_key">pref_capital_letters</string>
     <string name="pref_a11y_hints_key">pref_a11y_hints</string>
     <string name="pref_speak_container_element_positions_key">pref_speak_container_element_positions_key</string>
@@ -281,6 +359,8 @@
     <string name="pref_allow_frequent_content_change_announcement_key">pref_allow_frequent_content_change_announcement_key</string>
     <string name="pref_verbose_scroll_announcement_key">pref_verbose_scroll_announcement_key</string>
     <string name="pref_announce_full_charge_key">pref_announce_full_charge</string>
+    <string name="pref_announce_caller_key">pref_announce_caller</string>
+    <string name="pref_announce_caller_default" translatable="false">once</string>
     <string name="pref_announce_call_length_key">pref_announce_call_length</string>
     <string name="pref_announce_keyboard_shown_hidden_key">pref_announce_keyboard_shown_hidden</string>
     <string name="pref_explore_by_touch_key">pref_explore_by_touch</string>
@@ -470,6 +550,17 @@
         <item>@string/screen_on_low_battery_30</item>
         <item>@string/screen_on_low_battery_50</item>
     </string-array>
+    <!-- Announce caller: the values CallerAnnouncer.parse reads. -->
+    <string-array name="pref_announce_caller_entries">
+        <item>@string/announce_caller_once</item>
+        <item>@string/announce_caller_repeat</item>
+        <item>@string/screen_on_battery_off</item>
+    </string-array>
+    <string-array name="pref_announce_caller_values" translatable="false">
+        <item>once</item>
+        <item>repeat</item>
+        <item>off</item>
+    </string-array>
     <!-- Battery level at intervals: the values BatteryLevelAnnouncements.parse reads. -->
     <string-array name="pref_battery_level_interval_entries">
         <item>@string/screen_on_battery_off</item>
@@ -501,6 +592,7 @@
     <string name="pref_ai_actions_included_key" translatable="false">pref_ai_actions_included_key</string>
     <string name="pref_selector_text_entities_key" translatable="false">pref_selector_text_entities_key</string>
     <string name="pref_selector_clipboard_history_key" translatable="false">pref_selector_clipboard_history_key</string>
+    <string name="pref_selector_word_suggestions_key" translatable="false">pref_selector_word_suggestions_key</string>
     <string name="pref_text_entities_key" translatable="false">pref_text_entities</string>
     <!-- Must match pref_text_entities_entries and TextEntityMenu's types. -->
     <string-array name="pref_text_entities_values" translatable="false">
@@ -2240,6 +2332,11 @@
       <item>@string/value_handwriting_wait_200</item>
       <item>@string/value_touch_explore_time_out_250ms</item>
       <item>@string/value_handwriting_wait_300</item>
+      <item>@string/value_focus_delay_500ms</item>
+      <item>@string/value_focus_delay_750ms</item>
+      <item>@string/value_focus_delay_1000ms</item>
+      <item>@string/value_focus_delay_1500ms</item>
+      <item>@string/value_focus_delay_2000ms</item>
     </string-array>
 
   <!-- Gesture start time values, in milliseconds. -->
@@ -2248,6 +2345,11 @@
       <item>200</item>
       <item>250</item>
       <item>300</item>
+      <item>500</item>
+      <item>750</item>
+      <item>1000</item>
+      <item>1500</item>
+      <item>2000</item>
     </string-array>
 
     <string name="pref_swipe_start_time_default" translatable="false">150</string>
@@ -2630,6 +2732,9 @@
   <string name="shortcut_value_choose_symbol" translatable="false">CHOOSE_SYMBOL</string>
   <string name="shortcut_value_toggle_editing_mode" translatable="false">TOGGLE_EDITING_MODE</string>
   <string name="shortcut_value_spell_password_field" translatable="false">SPELL_PASSWORD_FIELD</string>
+  <string name="shortcut_value_next_word_suggestion" translatable="false">NEXT_WORD_SUGGESTION</string>
+  <string name="shortcut_value_previous_word_suggestion" translatable="false">PREVIOUS_WORD_SUGGESTION</string>
+  <string name="shortcut_value_type_word_suggestion" translatable="false">TYPE_WORD_SUGGESTION</string>
   <string name="keycombo_shortcut_other_toggle_browse_mode_extra" translatable="false">keycombo_shortcut_other_toggle_browse_mode_extra</string>
   <string name="shortcut_value_granular_editing" translatable="false">GRANULAR_EDITING</string>
   <string name="shortcut_value_dictate" translatable="false">DICTATE</string>
@@ -2665,6 +2770,8 @@
   <string name="shortcut_value_split_screen" translatable="false">SPLIT_SCREEN</string>
   <string name="shortcut_value_lock_screen">LOCK_SCREEN</string>
   <string name="shortcut_value_power_menu">POWER_MENU</string>
+  <string name="shortcut_value_restart_phone">RESTART_PHONE</string>
+  <string name="shortcut_value_power_off_phone">POWER_OFF_PHONE</string>
   <string name="shortcut_value_show_custom_actions">SHOW_CUSTOM_ACTIONS</string>
   <string name="shortcut_value_editing">EDITING</string>
   <string name="shortcut_value_talkback_breakout">TALKBACK_BREAKOUT</string>
@@ -2762,6 +2869,7 @@
   <string name="shortcut_value_copy_text_from_screen" translatable="false">COPY_TEXT_FROM_SCREEN</string>
   <string name="shortcut_value_continuous_copy" translatable="false">CONTINUOUS_COPY</string>
   <string name="shortcut_value_submit_text" translatable="false">SUBMIT_TEXT</string>
+  <string name="shortcut_value_new_line" translatable="false">NEW_LINE</string>
   <string name="shortcut_value_clear_text" translatable="false">CLEAR_TEXT</string>
   <string name="shortcut_value_switch_keyboard" translatable="false">SWITCH_KEYBOARD</string>
   <string name="shortcut_value_character_count" translatable="false">CHARACTER_COUNT</string>
@@ -2792,6 +2900,7 @@
   <string name="shortcut_value_report_ai_response" translatable="false">REPORT_AI_RESPONSE</string>
   <string name="shortcut_value_announce_current_time_and_date" translatable="false">ANNOUNCE_CURRENT_TIME_AND_DATE</string>
   <string name="shortcut_value_announce_battery_state" translatable="false">ANNOUNCE_BATTERY_STATE</string>
+  <string name="shortcut_value_say_caller" translatable="false">SAY_CALLER</string>
   <string name="shortcut_value_announce_status" translatable="false">ANNOUNCE_STATUS</string>
   <string name="shortcut_value_speak_position" translatable="false">SPEAK_POSITION</string>
   <string name="shortcut_value_speak_coordinates" translatable="false">SPEAK_COORDINATES</string>
@@ -2832,6 +2941,7 @@
   <string name="pref_voice_commands_screen_key" translatable="false">pref_voice_commands_screen</string>
   <string name="pref_voice_commands_ai_key" translatable="false">pref_voice_commands_ai</string>
   <string name="pref_voice_editing_time_limit_key" translatable="false">pref_voice_editing_time_limit</string>
+  <string name="pref_voice_phrases_not_understood_key" translatable="false">pref_voice_phrases_not_understood</string>
   <string name="shortcut_value_toggle_auto_translation" translatable="false">TOGGLE_AUTO_TRANSLATION</string>
   <string name="shortcut_value_toggle_equalizer" translatable="false">TOGGLE_EQUALIZER</string>
   <string name="shortcut_value_toggle_focus_indicator" translatable="false">TOGGLE_FOCUS_INDICATOR</string>
@@ -2958,6 +3068,21 @@
     </string-array>
 
     <string name="pref_emoji_repeat_count_default" translatable="false">0</string>
+
+    <string-array name="pref_emoji_after_name_entries">
+      <item>@string/value_emoji_after_name_nothing</item>
+      <item>@string/value_emoji_after_name_word</item>
+      <item>@string/value_emoji_after_name_sound</item>
+    </string-array>
+
+    <!-- The values of EmojiSpeech's AFTER_NAME constants, saved under EmojiSpeech.PREF_AFTER_NAME. -->
+    <string-array name="pref_emoji_after_name_values" translatable="false">
+      <item>nothing</item>
+      <item>word</item>
+      <item>sound</item>
+    </string-array>
+
+    <string name="pref_emoji_after_name_default" translatable="false">nothing</string>
 
     <!-- The list of the gestures which the platform supports. [CHAR_LIMIT=NONE] -->
     <string-array name="service_detected_gesture_list">
@@ -3150,6 +3275,7 @@
     <bool name="pref_overview_newest_last_default">false</bool>
     <bool name="pref_cache_keyboard_keys_default">false</bool>
     <bool name="pref_typing_hold_keys_down_default">false</bool>
+    <bool name="pref_typing_swipes_through_keys_default">false</bool>
     <bool name="pref_keypad_letter_keys_default">true</bool>
     <bool name="pref_enter_sends_messages_default">false</bool>
     <bool name="pref_double_tap_moves_cursor_default">false</bool>
@@ -3166,7 +3292,6 @@
     <string name="pref_punctuation_verbosity_default">2</string>
     <bool name="pref_punctuation_none_keep_meaning_default">false</bool>
     <bool name="pref_count_repeated_symbols_default">true</bool>
-    <bool name="pref_emoji_suffix_default">false</bool>
     <string name="pref_node_desc_order_default">pref_node_desc_order_value_state_name_role_pos</string>
     <string name="pref_time_feedback_format_default">pref_time_feedback_format_values_undefined</string>
     <bool name="pref_speak_element_ids_default">false</bool>
@@ -3268,6 +3393,7 @@
     <bool name="pref_selector_ai_actions_default">true</bool>
     <bool name="pref_selector_text_entities_default">false</bool>
     <bool name="pref_selector_clipboard_history_default">false</bool>
+    <bool name="pref_selector_word_suggestions_default">false</bool>
     <bool name="pref_selector_switch_tts_engine_default">false</bool>
     <bool name="pref_selector_speech_stream_default">false</bool>
     <bool name="pref_selector_audio_output_default">false</bool>
@@ -4034,6 +4160,7 @@
     <string name="selector_ai_actions" translatable="false">SELECTOR_AI_ACTIONS</string>
     <string name="selector_text_entities" translatable="false">SELECTOR_TEXT_ENTITIES</string>
     <string name="selector_clipboard_history" translatable="false">SELECTOR_CLIPBOARD_HISTORY</string>
+    <string name="selector_word_suggestions" translatable="false">SELECTOR_WORD_SUGGESTIONS</string>
     <string name="selector_switch_tts_engine" translatable="false">SELECTOR_SWITCH_TTS_ENGINE</string>
     <string name="selector_speech_stream" translatable="false">SELECTOR_SPEECH_STREAM</string>
     <string name="selector_audio_output" translatable="false">SELECTOR_AUDIO_OUTPUT</string>
@@ -4121,6 +4248,7 @@
     <string name="pref_update_welcome_sandfly_0_5_0_shown_key" translatable="false">pref_update_welcome_sandfly_0_5_0_shown_key</string>
     <string name="pref_update_welcome_sandfly_0_6_0_shown_key" translatable="false">pref_update_welcome_sandfly_0_6_0_shown_key</string>
     <string name="pref_update_welcome_sandfly_0_7_0_shown_key" translatable="false">pref_update_welcome_sandfly_0_7_0_shown_key</string>
+    <string name="pref_update_welcome_sandfly_0_8_0_shown_key" translatable="false">pref_update_welcome_sandfly_0_8_0_shown_key</string>
     <string-array name="pref_dictation_auto_stop_values" translatable="false">
         <item>0</item>
         <item>1000</item>

@@ -57,6 +57,10 @@ With **Navigation** > **Wrap around** on, which is the default, a swipe past the
 
 When the **Actions** reading control is selected, a double-tap performs the action chosen in it. See [](#reading-controls).
 
+With **Typing** > **Double-tap moves cursor to start or end** on, a double-tap on the text field that you are typing in moves the cursor to the start or end of the text. See [](#typing-double-tap-cursor).
+
+**Activate** does what a double-tap does in all of these cases, whichever gesture, voice command, braille command or script runs it.
+
 **Activate with a tap**, a command with no gesture by default, taps the middle of the focused item on the screen, for items that respond only to a finger on the screen. It needs Android 11 or later; otherwise the item is activated as usual.
 
 To activate items by lifting your finger or with a single tap, see [](#touch).
@@ -69,7 +73,7 @@ A reading control sets what a swipe up or swipe down does. Most reading controls
 - To select the previous reading control, swipe up then down, swipe left or up with three fingers, or rotate counterclockwise with two fingers.
 - To select the first reading control of the list in use, assign a gesture or keyboard shortcut to **First reading control**. It has none by default.
 - To move by the selected reading control, swipe down to go forward and swipe up to go back. These are the **Move reading control down or forward** and **Move reading control up or backward** commands.
-- On reading controls that change a value, such as **Adjust slider**, **Adjust value** and **Speech rate**, the direction of the swipe sets the change, whichever of the two commands the swipe runs: a swipe up or right increases the value, a swipe down or left decreases it. With a right-to-left language, a swipe left increases the value and a swipe right decreases it.
+- On reading controls that change a value, such as **Adjust slider**, **Adjust value** and **Speech rate**, the direction of the swipe sets the change, whichever of the two commands the swipe runs: a swipe up or right increases the value, a swipe down or left decreases it. This applies to straight swipes with one to four fingers. With a right-to-left language, a swipe left increases the value and a swipe right decreases it. With other gestures, keyboard shortcuts and braille display commands, **Move reading control up or backward** increases the value and **Move reading control down or forward** decreases it.
 
 SandFly reads the name of each reading control as you select it. Swiping right and left moves by item, whichever reading control is selected, except with **Rows and columns** in a table.
 
@@ -86,7 +90,7 @@ These reading controls move through the text of the focused item, and then on to
 - **Characters**: one character at a time.
 - **Words**: one word at a time.
 - **Lines**: one line at a time.
-- **Sentences**: one sentence at a time. A sentence ends at sentence punctuation, including Chinese 。！？, and at the end of a line. On web pages, a sentence that continues into another item, such as a link inside it, is read in parts. Not in the list by default, and not available in selection mode.
+- **Sentences**: one sentence at a time. A sentence ends at sentence punctuation, including Chinese 。！？, and at the end of a line. On web pages, a sentence that continues into another item, such as a link inside it, is read in parts. Not in the list by default, and not available in selection mode. The commands **Next sentence** and **Previous sentence**, in the **Navigate by text** category, move by sentence without the reading control.
 - **Paragraphs**: one paragraph at a time.
 
 In a text field that is being edited, these reading controls move the cursor, and swipes stay in the field. For editing text, see [](#typing).
@@ -138,15 +142,19 @@ SandFly keeps the screen on while it reads.
 Swiping right and left scrolls lists by itself when the next item is off screen. You can also scroll yourself:
 
 - To scroll forward, swipe right then left. This is **Scroll forward**.
-- To scroll back, swipe left then right. This is **Scroll back**. At the top of a list, **Scroll back** pulls the list down, which refreshes it in most apps.
+- To scroll back, swipe left then right. This is **Scroll back**. At the top of a list, **Scroll back** pulls the list down, which refreshes it in most apps. Pulling needs Android 13 or later.
 - To scroll the app directly, drag two fingers on the screen, as you would drag one finger without SandFly.
 
 In the default gesture layout, two-finger swipes go to the app and scroll it. With **Gestures** > **Handle two-finger swipes in SandFly** on, as in the VoiceOver gesture layout, two-finger swipes run commands instead: by default **Scroll up**, **Scroll down**, **Scroll left** and **Scroll right**, which move the content in the direction of the swipe. Where no item on the screen scrolls sideways, **Scroll left** and **Scroll right** send a one-finger swipe to the pager around the focused item, such as the folder tabs in Solid Explorer. These four commands need Android 11 or later, and aren't on watches.
 
+On a phone, if a two-finger scroll moves the focused item out of view, SandFly can move focus to a visible item in the same list. When you run **Scroll forward** or **Scroll back** from a list item, focus moves with the list.
+
+When nothing on the screen can scroll that way, such as at the end of a list, **Scroll forward**, **Scroll back** and these four commands play the **Action done or end reached** sound. At the top of a list, **Scroll back** and **Scroll down** pull the list down instead, with no sound. From a braille display, **Scroll forward** and **Scroll back** play the **Braille command failed** sound instead.
+
 These commands, in the **Scrolling** category, have no gesture by default:
 
 - **Scroll to top** and **Scroll to bottom** scroll the list that has focus to its start or end, a page at a time, and then focus its first or last item. A touch, gesture or key stops them. Not on watches.
-- **Refresh** scrolls the list to its top and pulls it down. It needs Android 11 or later.
+- **Refresh** scrolls the list to its top and pulls it down. It needs Android 13 or later.
 
 While you scroll with two fingers, SandFly plays the scroll sound and a light vibration for each item that scrolls past. The pitch of the scroll sound rises from the top of the list to the bottom. Scrolls that SandFly makes to reach the next item make no sound. For sound and vibration settings, see [](#sound).
 
@@ -155,7 +163,7 @@ While you scroll with two fingers, SandFly plays the scroll sound and a light vi
 These settings on the **Navigation** screen change how swipes scroll lists:
 
 - **Scroll ahead to the next item**: When the focused item is the last item of a list on the screen, SandFly scrolls the list forward while it reads the item, until the next item is on the screen, so that the next swipe doesn't wait for a scroll. Focus stays on the item, and the scroll makes no sound. After a move back, SandFly scrolls back instead. It doesn't scroll ahead in text fields, in web content or during continuous reading, and stops when you touch the screen, press a key or a window changes. On by default.
-- **Speak the next item while scrolling**: When a swipe has to scroll a list to reach the next item, SandFly focuses and reads the item as soon as it comes on the screen, while the list is still moving. Turn it off to wait until the list slows down. On by default.
+- **Speak the next item while scrolling**: When a swipe has to scroll a list to reach the next item, SandFly focuses and reads the item as soon as it comes on the screen, while the list is still moving. At the edge of an Android scroll view, SandFly can move on as soon as it confirms that scrolling has reached the end. Turn it off to wait until the list slows down. On by default.
 - **Speak items before they scroll into view**: When a swipe moves to an item that is only partly on the screen, SandFly reads it at once, including the parts still past the edge of the list, instead of waiting for the list to scroll. Off by default, because some apps keep hidden text outside an item instead of hiding it, and that text is then read.
 
 ### Lists and tables {#reading-lists-tables}
@@ -233,7 +241,7 @@ Phone numbers are found by the text classifier of Android, which also finds date
 
 **Copy text from screen**, a command in the **Text editing** category with no gesture by default, opens a window with the text on the screen as a list of check boxes.
 
-The window lists the text on the screen. When the screen has a list or page that scrolls, **Scroll up** above the list and **Scroll down** below it scroll that list a page past the text listed so far and add that page's text. SandFly announces "Added" and the number of pieces added. Checked pieces stay checked. When the list is at its start or end, SandFly says "No more text". The list scrolls back to where it was when the window closes.
+The window lists the text on the screen. When the screen has a list or page that scrolls, **Scroll up** above the list and **Scroll down** below it scroll that list a page past the text listed so far and add the text of that page. SandFly announces "Added" and the number of pieces added. Checked pieces stay checked. When the list is at its start or end, SandFly says "No more text". The list scrolls back to where it was when the window closes.
 
 1. Run **Copy text from screen**.
 2. Under **Granularity**, choose how the text is divided: **Addresses and numbers**, **Characters**, **Words** or **Paragraphs**. **Words** is selected first.

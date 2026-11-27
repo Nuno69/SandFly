@@ -334,6 +334,7 @@ public class TextEventInterpreter {
         interpret(event, shouldEchoAddedText, shouldEchoInitialWords);
 
     filter.filterAndSendInterpretation(event, eventId, interpretation);
+    filter.onTextEventHandled(event);
   }
 
   // dereference of possibly-null reference event.getBeforeText()
@@ -554,6 +555,9 @@ public class TextEventInterpreter {
       } else if (actionHistory.hasSetTextActionAtTime(eventTime)) {
         interpretation.setEvent(TextEventInterpretation.SET_TEXT_BY_ACTION);
         interpretation.setReason("Set text action ongoing.");
+        // The cursor is where setting the text left it, so the next move is read from there.
+        mHistory.setLastFromIndex(fromIndex);
+        mHistory.setLastToIndex(toIndex);
         return interpretation;
       } else if (fromIndex == 0
           && toIndex == 0

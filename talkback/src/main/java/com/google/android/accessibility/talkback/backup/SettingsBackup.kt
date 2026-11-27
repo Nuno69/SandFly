@@ -30,6 +30,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.accessibility.talkback.R
 import com.google.android.accessibility.talkback.TalkBackService
+import com.google.android.accessibility.talkback.actor.voicecommands.NotUnderstoodPhrases
 import com.google.android.accessibility.talkback.commands.RemovedCommands
 import com.google.android.accessibility.talkback.gesture.AppShortcutActions
 import com.google.android.accessibility.talkback.labeling.LabelBackup
@@ -39,6 +40,7 @@ import com.google.android.accessibility.talkback.quicksettings.SystemTiles
 import com.google.android.accessibility.talkback.scripting.ScriptHostFactory
 import com.google.android.accessibility.talkback.soundthemes.SoundThemes
 import com.google.android.accessibility.talkback.soundthemes.StagedTheme
+import com.google.android.accessibility.talkback.utils.FileReplace
 import com.google.android.accessibility.talkback.wallpaper.SandFlyWallpaperService
 import com.google.android.accessibility.utils.FormFactorUtils
 import com.google.android.accessibility.utils.SharedPreferencesUtils
@@ -98,7 +100,8 @@ object SettingsBackup {
    */
   @VisibleForTesting const val PRO_PREFS = "sandfly_ai"
 
-  private val SKIPPED_FILES = setOf(MigrationFiles.STATE_PREFS, PRO_PREFS, AppShortcutActions.LISTED_PREFS)
+  private val SKIPPED_FILES =
+    setOf(MigrationFiles.STATE_PREFS, PRO_PREFS, AppShortcutActions.LISTED_PREFS, NotUnderstoodPhrases.PREFS)
 
   /** Files of libraries, such as Google Play services and WebView, which hold their own state. */
   private val LIBRARY_PREFIXES = listOf("com.google.", "androidx.", "WebView", "Firebase")
@@ -405,7 +408,7 @@ object SettingsBackup {
     val target = SandFlyWallpaperService.imageFile(context)
     val temporary = File(target.parentFile, target.name + ".new")
     image.copyTo(temporary, overwrite = true)
-    if (!temporary.renameTo(target)) {
+    if (!FileReplace.replace(temporary, target)) {
       temporary.delete()
       throw IOException("Cannot replace the wallpaper image")
     }

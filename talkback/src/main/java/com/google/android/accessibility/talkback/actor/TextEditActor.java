@@ -23,6 +23,7 @@ import static com.google.android.accessibility.talkback.Feedback.FocusDirection.
 import static com.google.android.accessibility.talkback.compositor.CompositorUtils.joinCharSequences;
 import static com.google.android.accessibility.utils.output.FeedbackItem.FLAG_FORCE_FEEDBACK_ALL;
 import static com.google.android.accessibility.utils.output.FeedbackItem.FLAG_NO_HISTORY;
+import static com.google.android.accessibility.utils.output.SpeechController.QUEUE_MODE_INTERRUPT;
 import static com.google.android.accessibility.utils.output.SpeechController.QUEUE_MODE_INTERRUPT_AND_UNINTERRUPTIBLE_BY_NEW_SPEECH;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -81,6 +82,10 @@ public class TextEditActor {
           .setFlags(
               FLAG_NO_HISTORY
                   | FLAG_FORCE_FEEDBACK_ALL);
+
+  /** Inserted text is said as typed text is: the next speech interrupts it. */
+  private static final SpeakOptions INSERTED_TEXT_OPTIONS =
+      SpeakOptions.create().setQueueMode(QUEUE_MODE_INTERRUPT).setFlags(FLAG_FORCE_FEEDBACK_ALL);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
   // Inner class for actor-state reader
@@ -710,7 +715,16 @@ public class TextEditActor {
             nodeText.subSequence(selectionEnd, nodeText.length()));
     Bundle arguments = new Bundle();
     arguments.putCharSequence(ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, textUpdated.toString());
+    // Setting the text places the cursor at the start and then the end of the field, and the
+    // cursor move below takes it back; none of these are read as cursor moves. The removed text is
+    // said below, so the app's own text change isn't.
+    editTextActionHistory.beforeSetText();
+    editTextActionHistory.beforeSpokenEdit();
     boolean result = PerformActionUtils.performAction(node, ACTION_SET_TEXT, arguments, eventId);
+    // Move cursor to start of deleted text.
+    boolean moved = result && moveCursor(node, selectionStart, eventId);
+    editTextActionHistory.afterSetText();
+    editTextActionHistory.afterSpokenEdit();
     if (!result) {
       return false;
     }
@@ -720,9 +734,165 @@ public class TextEditActor {
         SpannableUtils.getSpannedFormattedString(
             service.getString(R.string.template_text_removed), deletedText);
     pipeline.returnFeedback(eventId, Feedback.speech(textToSpeak, SPEAK_OPTIONS));
+    return moved;
+  }
 
-    // Move cursor to start of deleted text.
-    return moveCursor(node, selectionStart, eventId);
+  /**
+   * Moves the cursor of edit-text to {@code cursorIndex}, without the move being read as a cursor
+   * move, and says {@code passed}, the text the cursor passed over. Not in password fields.
+   */
+  public boolean moveCursorOverText(
+      @Nullable AccessibilityNodeInfoCompat node,
+      int cursorIndex,
+      @Nullable CharSequence passed,
+      EventId eventId) {
+    if (node == null || !AccessibilityNodeInfoUtils.isEditField(node) || node.isPassword()) {
+      return false;
+    }
+    editTextActionHistory.beforeSetText();
+    boolean moved = moveCursor(node, cursorIndex, eventId);
+    editTextActionHistory.afterSetText();
+    if (!moved) {
+      return false;
+    }
+    CharSequence spoken = CompositorUtils.refineInputText(service, passed);
+    if (!TextUtils.isEmpty(spoken)) {
+      pipeline.returnFeedback(
+          eventId,
+          Feedback.speech(
+              SpeechCleanupUtils.shortenLongTextFeedback(service, spoken), SPEAK_OPTIONS));
+    }
+    return true;
+  }
+
+  /**
+   * Selects {@code start} to {@code end} in edit-text, without the selection change being read,
+   * and says the selected text. Not in password fields.
+   */
+  public boolean selectRange(
+      @Nullable AccessibilityNodeInfoCompat node, int start, int end, EventId eventId) {
+    @Nullable CharSequence range = rangeText(node, start, end);
+    if (range == null || !setSelectionQuietly(node, start, end, eventId)) {
+      return false;
+    }
+    pipeline.returnFeedback(
+        eventId,
+        Feedback.speech(
+            SpannableUtils.getSpannedFormattedString(
+                service.getString(R.string.template_announce_selected_text),
+                SpeechCleanupUtils.shortenLongTextFeedback(
+                    service, CompositorUtils.refineInputText(service, range))),
+            SPEAK_OPTIONS));
+    return true;
+  }
+
+  /**
+   * Copies {@code start} to {@code end} of edit-text, leaving the cursor and selection as they
+   * are, and says the copied text, as Copy does. Not in password fields.
+   */
+  public boolean copyRange(
+      @Nullable AccessibilityNodeInfoCompat node, int start, int end, EventId eventId) {
+    @Nullable CharSequence range = rangeText(node, start, end);
+    if (range == null || !ClipboardHistory.copy(service, range.toString())) {
+      return false;
+    }
+    pipeline.returnFeedback(
+        eventId,
+        Feedback.speech(
+            SpannableUtils.getSpannedFormattedString(
+                service.getString(R.string.template_text_copied),
+                CompositorUtils.refineInputText(service, range)),
+            SPEAK_OPTIONS));
+    return true;
+  }
+
+  /**
+   * Selects {@code start} to {@code end} of edit-text without the selection change being read, and
+   * cuts it as Cut does. Not in password fields.
+   */
+  public boolean cutRange(
+      @Nullable AccessibilityNodeInfoCompat node, int start, int end, EventId eventId) {
+    if (rangeText(node, start, end) == null || !setSelectionQuietly(node, start, end, eventId)) {
+      return false;
+    }
+    node.refresh();
+    return cut(node, eventId);
+  }
+
+  /**
+   * Deletes {@code start} to {@code end} of edit-text, puts the cursor where it was, and says the
+   * deleted text, as Delete does. The range is taken out of the text as it is, rather than selected
+   * first, since an app can report the new selection after the node is read again. Not in password
+   * fields.
+   */
+  public boolean deleteRange(
+      @Nullable AccessibilityNodeInfoCompat node, int start, int end, EventId eventId) {
+    @Nullable CharSequence range = rangeText(node, start, end);
+    @Nullable CharSequence text = node == null ? null : AccessibilityNodeInfoUtils.getText(node);
+    if (range == null || text == null) {
+      return false;
+    }
+    Bundle arguments = new Bundle();
+    arguments.putCharSequence(
+        ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
+        TextUtils.concat(text.subSequence(0, start), text.subSequence(end, text.length()))
+            .toString());
+    editTextActionHistory.beforeSetText();
+    editTextActionHistory.beforeSpokenEdit();
+    boolean result = PerformActionUtils.performAction(node, ACTION_SET_TEXT, arguments, eventId);
+    // The text is deleted even when the app doesn't take the cursor move.
+    if (result && !moveCursor(node, start, eventId)) {
+      LogUtils.d(TAG, "deleteRange: moving the cursor to %d failed", start);
+    }
+    editTextActionHistory.afterSetText();
+    editTextActionHistory.afterSpokenEdit();
+    if (!result) {
+      return false;
+    }
+    pipeline.returnFeedback(
+        eventId,
+        Feedback.speech(
+            SpannableUtils.getSpannedFormattedString(
+                service.getString(R.string.template_text_removed),
+                CompositorUtils.refineInputText(service, range)),
+            SPEAK_OPTIONS));
+    return true;
+  }
+
+  /**
+   * The text from {@code start} to {@code end} of edit-text, or null when the range isn't in its
+   * text, is empty, or the field is a password field.
+   */
+  private static @Nullable CharSequence rangeText(
+      @Nullable AccessibilityNodeInfoCompat node, int start, int end) {
+    if (node == null || !AccessibilityNodeInfoUtils.isEditField(node) || node.isPassword()) {
+      return null;
+    }
+    @Nullable CharSequence text = AccessibilityNodeInfoUtils.getText(node);
+    if (text == null || start < 0 || end > text.length() || start >= end) {
+      return null;
+    }
+    return text.subSequence(start, end);
+  }
+
+  /**
+   * Sets the selection of {@code node} to {@code start} to {@code end}. The selection change is
+   * part of the action, as setting text is, so it isn't read.
+   */
+  private boolean setSelectionQuietly(
+      AccessibilityNodeInfoCompat node, int start, int end, EventId eventId) {
+    Bundle args = new Bundle();
+    args.putInt(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_START_INT, start);
+    args.putInt(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_SELECTION_END_INT, end);
+    editTextActionHistory.beforeSetText();
+    boolean result =
+        PerformActionUtils.performAction(
+            node, AccessibilityNodeInfoCompat.ACTION_SET_SELECTION, args, eventId);
+    editTextActionHistory.afterSetText();
+    if (!result) {
+      LogUtils.d(TAG, "setSelectionQuietly: setting the selection failed");
+    }
+    return result;
   }
 
   /** Executes and announces paste text in edit-text. Modifies edit history. */
@@ -757,9 +927,15 @@ public class TextEditActor {
     return result;
   }
 
-  /** Inserts text in edit-text. Modifies edit history. */
+  /**
+   * Inserts text in edit-text, and says the inserted text with {@code speak}. Modifies edit
+   * history.
+   */
   public boolean insert(
-      AccessibilityNodeInfoCompat node, CharSequence textToInsert, EventId eventId) {
+      AccessibilityNodeInfoCompat node,
+      CharSequence textToInsert,
+      boolean speak,
+      EventId eventId) {
     if (node == null || !AccessibilityNodeInfoUtils.isEditField(node)) {
       return false;
     }
@@ -797,15 +973,33 @@ public class TextEditActor {
             currentText.subSequence(selectionEnd, currentText.length()));
     Bundle arguments = new Bundle();
     arguments.putCharSequence(ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, textUpdated.toString());
+    // Setting the text places the cursor at the start and then the end of the field, and the
+    // cursor move below takes it to the end of the inserted text. None of these are read as cursor
+    // moves, which would read the whole text of the field.
+    boolean spoken = speak && !node.isPassword();
+    editTextActionHistory.beforeSetText();
+    if (spoken) {
+      editTextActionHistory.beforeSpokenEdit();
+    }
     boolean result = PerformActionUtils.performAction(node, ACTION_SET_TEXT, arguments, eventId);
+    // Setting text can change the actions offered by an empty field. Refresh before moving the
+    // cursor, but don't report that typing failed when only this cursor move failed.
+    if (result && node.refresh()) {
+      moveCursor(node, selectionStart + textToInsert.length(), eventId);
+    }
+    editTextActionHistory.afterSetText();
+    if (spoken) {
+      // The app's own text change, if it sends one, isn't said as well.
+      editTextActionHistory.afterSpokenEdit();
+    }
     if (!result) {
       return false;
     }
-
-    // Setting text can change the actions offered by an empty field. Refresh before moving the
-    // cursor, but don't report that typing failed when only this cursor move failed.
-    if (node.refresh()) {
-      moveCursor(node, selectionStart + textToInsert.length(), eventId);
+    if (spoken) {
+      CharSequence insertedText = CompositorUtils.refineInputText(service, textToInsert);
+      if (!TextUtils.isEmpty(insertedText)) {
+        pipeline.returnFeedback(eventId, Feedback.speech(insertedText, INSERTED_TEXT_OPTIONS));
+      }
     }
     return true;
   }
@@ -858,15 +1052,16 @@ public class TextEditActor {
     arguments.putCharSequence(ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, textReplaced.toString());
     editTextActionHistory.beforeSetText();
     boolean result = PerformActionUtils.performAction(node, ACTION_SET_TEXT, arguments, eventId);
+    // Moves the cursor to the end of the replaced text. The move is part of setting the text, so it
+    // isn't read as a cursor move.
+    boolean moved = moveCursor(node, start + suggestion.length(), eventId);
     editTextActionHistory.afterSetText();
     if (result) {
       pipeline.returnFeedback(
           eventId,
           Feedback.speech(service.getString(R.string.text_replaced_feedback), SPEAK_OPTIONS));
     }
-
-    // Moves the cursor to the end of the replaced text.
-    return moveCursor(node, start + suggestion.length(), eventId);
+    return moved;
   }
 
   /**

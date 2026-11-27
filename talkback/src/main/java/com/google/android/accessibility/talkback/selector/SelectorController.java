@@ -24,7 +24,7 @@ import static com.google.android.accessibility.talkback.Feedback.AdjustVolume.Ac
 import static com.google.android.accessibility.talkback.Feedback.AdjustVolume.StreamType.STREAM_TYPE_ACCESSIBILITY;
 import static com.google.android.accessibility.talkback.Feedback.DimScreen.Action.BRIGHTEN;
 import static com.google.android.accessibility.talkback.Feedback.DimScreen.Action.DIM;
-import static com.google.android.accessibility.talkback.Feedback.Focus.Action.CLICK_NODE;
+import static com.google.android.accessibility.talkback.Feedback.Focus.Action.CLICK_CURRENT;
 import static com.google.android.accessibility.talkback.Feedback.FocusDirection.Action.NEXT_PAGE;
 import static com.google.android.accessibility.talkback.Feedback.FocusDirection.Action.PREVIOUS_PAGE;
 import static com.google.android.accessibility.talkback.Feedback.Language.Action.NEXT_LANGUAGE;
@@ -87,6 +87,7 @@ import com.google.android.accessibility.talkback.R;
 import com.google.android.accessibility.talkback.TalkBackService;
 import com.google.android.accessibility.talkback.clipboard.ClipboardHistoryOverlay;
 import com.google.android.accessibility.talkback.gesture.GestureLayout;
+import com.google.android.accessibility.talkback.keyboard.SandFlyKeyboardHost;
 import com.google.android.accessibility.talkback.preference.ItemOrder;
 import com.google.android.accessibility.talkback.UserInterface.UserInputEventListener;
 import com.google.android.accessibility.talkback.analytics.TalkBackAnalytics;
@@ -153,6 +154,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Class to handle changes to selector and calls from {@link GestureController}. */
@@ -331,6 +333,10 @@ public class SelectorController implements UserInputEventListener {
         R.string.pref_selector_clipboard_history_key,
         R.string.selector_clipboard_history,
         R.bool.pref_selector_clipboard_history_default),
+    WORD_SUGGESTIONS(
+        R.string.pref_selector_word_suggestions_key,
+        R.string.selector_word_suggestions,
+        R.bool.pref_selector_word_suggestions_default),
     ACTIONS(
         R.string.pref_selector_actions_key,
         R.string.selector_actions,
@@ -769,6 +775,7 @@ public class SelectorController implements UserInputEventListener {
           Setting.ACTIONS,
           Setting.TEXT_ENTITIES,
           Setting.CLIPBOARD_HISTORY,
+          Setting.WORD_SUGGESTIONS,
           // Puts table navigation granularities on top of the selector.
           Setting.GRANULARITY_ROW_COLUMN,
           Setting.GRANULARITY_ROW,
@@ -977,6 +984,7 @@ public class SelectorController implements UserInputEventListener {
       hiddenSettingsBuilder.add(Setting.AI_ACTIONS);
       hiddenSettingsBuilder.add(Setting.TEXT_ENTITIES);
       hiddenSettingsBuilder.add(Setting.CLIPBOARD_HISTORY);
+      hiddenSettingsBuilder.add(Setting.WORD_SUGGESTIONS);
     }
     // Hide SEARCH in selector.
     if (!FeatureFlagReader.enableScreenSearchNavigation(context)
@@ -1325,6 +1333,10 @@ public class SelectorController implements UserInputEventListener {
         clipboardHistorySetting.reset();
         actionDescription = context.getString(R.string.title_clipboard_history);
         hint = context.getString(R.string.clipboard_history_hint);
+      }
+      case WORD_SUGGESTIONS -> {
+        actionDescription = context.getString(R.string.title_pref_sandfly_keyboard_suggestions);
+        hint = context.getString(R.string.word_suggestions_hint);
       }
       case ACTIONS -> {
         // Reset currentActionId to the default action.
@@ -1842,12 +1854,51 @@ public class SelectorController implements UserInputEventListener {
   }
 
   /**
-   * Selects the previous or next setting without overlay displayed. For selecting setting via
-   * gesture.
+   * Selects the nearest reading control of {@code wanted} after or before the selected one, without
+   * the overlay: in the list that next and previous reading control go through, or in the main list
+   * when that list has none of them. The selected one again when it is the only one.
+   *
+   * @return {@code false} if neither list has one that can be used now.
    */
-  public void selectPreviousOrNextSettingWithoutOverlay(
-      EventId eventId, AnnounceType announceType, boolean isNext) {
-    selectPreviousOrNext(eventId, announceType, isNext, false);
+  public boolean selectPreviousOrNextSettingOf(
+      EventId eventId, AnnounceType announceType, boolean isNext, Set<Setting> wanted) {
+    applyPendingSwitch();
+    List<Object> entries = rotorEntries();
+    @Nullable Setting setting =
+        adjacentSettingOf(entries, currentRotorIndex(entries), isNext, wanted);
+    if (setting == null) {
+      List<Object> main = new ArrayList<>(getFilteredSettings());
+      setting = adjacentSettingOf(main, currentRotorIndex(main), isNext, wanted);
+    }
+    if (setting == null) {
+      return false;
+    }
+    pipeline.returnFeedback(
+        eventId,
+        Feedback.sound(isNext ? R.raw.next_reading_control : R.raw.previous_reading_control));
+    setCurrentSetting(eventId, setting, announceType, /* showOverlay= */ false);
+    return true;
+  }
+
+  /**
+   * The nearest entry of {@code entries} after or before {@code index} that is a setting of {@code
+   * wanted}, wrapping around, or null if there is none. From the start or end of the list when
+   * {@code index} is -1.
+   */
+  @VisibleForTesting
+  static @Nullable Setting adjacentSettingOf(
+      List<?> entries, int index, boolean isNext, Set<Setting> wanted) {
+    int size = entries.size();
+    for (int step = 1; step <= size; step++) {
+      int i =
+          index < 0
+              ? (isNext ? step - 1 : size - step)
+              : Math.floorMod(index + (isNext ? step : -step), size);
+      if (entries.get(i) instanceof Setting setting && wanted.contains(setting)) {
+        return setting;
+      }
+    }
+    return null;
   }
 
   /**
@@ -2334,6 +2385,11 @@ public class SelectorController implements UserInputEventListener {
       case TEXT_ENTITIES -> {
         return FeatureSupport.doesServiceHandleDoubleTap()
             && !TextEntityMenu.included(context).isEmpty();
+      }
+      case WORD_SUGGESTIONS -> {
+        // While a word is typed with the SandFly keyboard, with Word suggestions on.
+        return FeatureSupport.doesServiceHandleDoubleTap()
+            && SandFlyKeyboardHost.hasWordSuggestions();
       }
       case CLIPBOARD_HISTORY -> {
         // The history can hold private text.
@@ -2839,6 +2895,10 @@ public class SelectorController implements UserInputEventListener {
         changeClipboardEntry(eventId, isNext);
         return;
       }
+      case WORD_SUGGESTIONS -> {
+        changeWordSuggestion(eventId, isNext);
+        return;
+      }
       case SPEECH_RATE -> {
         changeSpeechRate(eventId, increases(isNext));
         return;
@@ -3105,6 +3165,9 @@ public class SelectorController implements UserInputEventListener {
     if (setting == Setting.CLIPBOARD_HISTORY) {
       return pasteClipboardEntry();
     }
+    if (setting == Setting.WORD_SUGGESTIONS) {
+      return SandFlyKeyboardHost.typeSuggestion();
+    }
     return false;
   }
 
@@ -3128,6 +3191,20 @@ public class SelectorController implements UserInputEventListener {
         eventId,
         ClipboardHistoryOverlay.shortened(text),
         context.getString(R.string.clipboard_history_hint));
+  }
+
+  /**
+   * Says the next or previous suggestion for the word typed with the SandFly keyboard, which
+   * double-tap then types.
+   */
+  private void changeWordSuggestion(EventId eventId, boolean isNext) {
+    @Nullable String said = SandFlyKeyboardHost.stepSuggestion(isNext);
+    doubleTapArmed = said != null && SandFlyKeyboardHost.hasWordSuggestions();
+    requestServiceHandlesDoubleTap(eventId, doubleTapArmed);
+    announceSetting(
+        eventId,
+        said != null ? said : context.getString(R.string.sandfly_keyboard_needed),
+        doubleTapArmed ? context.getString(R.string.word_suggestions_hint) : null);
   }
 
   /** Pastes the clipboard history's text said last into the edit box with focus. */
@@ -3229,9 +3306,10 @@ public class SelectorController implements UserInputEventListener {
       return false;
     }
 
-    // Always perform click action on the node.
+    // Click activates the focused item as double tap does with any other reading control, so that
+    // a list item activated with it, such as a folder, is focused again after Back.
     if (currentActionId.itemId() == AccessibilityNodeInfoCompat.ACTION_CLICK) {
-      pipeline.returnFeedback(eventId, Feedback.focus(CLICK_NODE).setTarget(node));
+      pipeline.returnFeedback(eventId, Feedback.focus(CLICK_CURRENT));
       return true;
     }
 

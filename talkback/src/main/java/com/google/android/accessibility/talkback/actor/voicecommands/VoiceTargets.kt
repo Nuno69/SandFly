@@ -43,7 +43,7 @@ class VoiceTargets(private val context: Context, private val locale: Locale) : V
   }
 
   private val commandsByName: Map<String, Commands.Command> by lazy {
-    commandNames(categories, apps, locale)
+    commandNames(categories, apps, locale, aliases(context))
   }
 
   private val custom: List<CustomVoiceCommands.Entry> by lazy {
@@ -70,22 +70,65 @@ class VoiceTargets(private val context: Context, private val locale: Locale) : V
      * their command list labels ("Open Gmail"), which the open phrase reads as an app.
      */
     @JvmStatic
+    @JvmOverloads
     fun commandNames(
       categories: List<Commands.Category>,
       apps: List<OpenAppActions.App>,
       locale: Locale,
+      aliases: Map<String, List<String>> = emptyMap(),
     ): Map<String, Commands.Command> {
       val names = HashMap<String, Commands.Command>()
       val (appCategories, own) = categories.partition { it.titleRes == R.string.shortcut_title_open_app }
-      for (command in own.flatMap { it.commands }) {
+      val ownCommands = own.flatMap { it.commands }
+      for (command in ownCommands) {
         names.putIfAbsent(VoiceGrammar.normalize(command.label, locale), command)
       }
+      VoiceEditingRules.addAliases(names, ownCommands, aliases, locale)
       val appCommands = appCategories.flatMap { it.commands }.associateBy { it.value }
       for (app in apps) {
         val command = appCommands[app.value] ?: continue
         names.putIfAbsent(VoiceGrammar.normalize(app.label, locale), command)
       }
       return names
+    }
+
+    /**
+     * Other names of commands, by command value: "new line", "new paragraph" and "press enter" for
+     * New line. They are names, so "press enter" runs New line instead of tapping an item.
+     */
+    @JvmStatic
+    fun aliases(context: Context): Map<String, List<String>> =
+      mapOf(
+        context.getString(R.string.shortcut_value_new_line) to
+          context.resources.getStringArray(R.array.voice_commands_new_line).toList()
+      )
+
+    /** The text editing phrases, in the language of [context]. */
+    @JvmStatic
+    fun textPhrases(context: Context): VoiceGrammar.TextPhrases {
+      val resources = context.resources
+      fun array(id: Int): List<String> = resources.getStringArray(id).toList()
+      return VoiceGrammar.TextPhrases(
+        move = array(R.array.voice_commands_text_move),
+        select = array(R.array.voice_commands_text_select),
+        copy = array(R.array.voice_commands_text_copy),
+        cut = array(R.array.voice_commands_text_cut),
+        delete = array(R.array.voice_commands_text_delete),
+        next = array(R.array.voice_commands_text_next),
+        previous = array(R.array.voice_commands_text_previous),
+        start = array(R.array.voice_commands_text_start),
+        end = array(R.array.voice_commands_text_end),
+        units =
+          mapOf(
+            TextUnit.CHARACTER to array(R.array.voice_commands_text_characters),
+            TextUnit.WORD to array(R.array.voice_commands_text_words),
+            TextUnit.SENTENCE to array(R.array.voice_commands_text_sentences),
+            TextUnit.LINE to array(R.array.voice_commands_text_lines),
+            TextUnit.PARAGRAPH to array(R.array.voice_commands_text_paragraphs),
+            TextUnit.TEXT to array(R.array.voice_commands_text_whole),
+          ),
+        numbers = array(R.array.voice_commands_text_numbers),
+      )
     }
 
     /**

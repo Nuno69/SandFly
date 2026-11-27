@@ -524,6 +524,12 @@
     <string name="battery_level_every_hour">Every hour</string>
     <!-- List: the voice the Battery level announcements are said with: the notification voice, SandFly's voice or a voice profile. [CHAR LIMIT=NONE] -->
     <string name="title_pref_battery_level_voice">Battery level voice</string>
+    <!-- List: how often SandFly says the caller of an incoming phone call or app call, such as a WhatsApp call: once, repeatedly while the call rings, or not at all. [CHAR LIMIT=NONE] -->
+    <string name="title_pref_announce_caller">Announce caller</string>
+    <!-- Choice in the Announce caller list: say the caller once when the call starts ringing. [CHAR LIMIT=40] -->
+    <string name="announce_caller_once">Once</string>
+    <!-- Choice in the Announce caller list: say the caller again every few seconds until the call is answered, declined or ends. [CHAR LIMIT=40] -->
+    <string name="announce_caller_repeat">Repeat while ringing</string>
     <!-- Title of the switch that says how long a phone call lasted when it ends. [CHAR LIMIT=NONE] -->
     <string name="title_pref_announce_call_length">Announce call length</string>
     <!-- Spoken when a phone call ends, with Announce call length on. %1$s is how long it lasted, such as "3 minutes, 12 seconds". [CHAR LIMIT=NONE] -->
@@ -792,8 +798,14 @@
       Source: Preference for saying how many times an emoji repeats, like "3 grinning face", instead of naming it each time. [CHAR LIMIT=45]
     -->
     <string name="title_pref_emoji_repeat_count">Count repeated emoji</string>
-    <!-- Title of the verbosity switch that speaks "emoji" after each emoji name, like "grinning face emoji". [CHAR LIMIT=50] -->
-    <string name="title_pref_emoji_suffix">Speak \"emoji\" after emoji names</string>
+    <!-- Title of the verbosity list that sets what follows each emoji name: nothing, the word "emoji", like "grinning face emoji", or a sound. [CHAR LIMIT=50] -->
+    <string name="title_pref_emoji_after_name">After emoji names</string>
+    <!-- After emoji names choice: nothing follows emoji names. [CHAR LIMIT=45] -->
+    <string name="value_emoji_after_name_nothing">Nothing</string>
+    <!-- After emoji names choice: the word "emoji" is spoken after each emoji name, like "grinning face emoji". Keep "emoji" as in template_emoji_name_suffix. [CHAR LIMIT=45] -->
+    <string name="value_emoji_after_name_word">Say \"emoji\"</string>
+    <!-- After emoji names choice: a sound plays after each emoji name. [CHAR LIMIT=45] -->
+    <string name="value_emoji_after_name_sound">Play a sound</string>
     <!--
       Source: Count repeated emoji choice: each emoji is named every time. [CHAR LIMIT=45]
     -->
@@ -1119,11 +1131,11 @@
     <string name="overview_empty">No recent apps</string>
     <!-- Shown in SandFly's overview when the recent apps can't be read through Shizuku. [CHAR_LIMIT=NONE] -->
     <string name="overview_unavailable">Recent apps unavailable</string>
-    <!-- Spoken when the system's recent apps screen opens in place of SandFly's overview, or a quick settings tile command can't run, because Shizuku isn't running. [CHAR_LIMIT=NONE] -->
+    <!-- Spoken when the system's recent apps screen opens in place of SandFly's overview, the system power menu in place of Restart phone or Power off phone, or a quick settings tile command can't run, because Shizuku isn't running. [CHAR_LIMIT=NONE] -->
     <string name="overview_shizuku_not_running">Shizuku not running</string>
-    <!-- Spoken when the system's recent apps screen opens in place of SandFly's overview, or a quick settings tile command can't run, because Shizuku doesn't allow SandFly. [CHAR_LIMIT=NONE] -->
+    <!-- Spoken when the system's recent apps screen opens in place of SandFly's overview, the system power menu in place of Restart phone or Power off phone, or a quick settings tile command can't run, because Shizuku doesn't allow SandFly. [CHAR_LIMIT=NONE] -->
     <string name="overview_shizuku_not_allowed">Shizuku doesn\'t allow SandFly</string>
-    <!-- Spoken when a feature that needs root can't run because su doesn't give SandFly root, with Use root instead of Shizuku on. [CHAR_LIMIT=NONE] -->
+    <!-- Spoken when a feature that needs root can't run because su doesn't give SandFly root, with Use root instead of Shizuku on, such as when the system power menu opens in place of Restart phone or Power off phone. [CHAR_LIMIT=NONE] -->
     <string name="no_root_access">No root access</string>
     <!-- Spoken when SandFly's overview couldn't switch to or close an app. [CHAR_LIMIT=NONE] -->
     <string name="overview_failed">Failed</string>
@@ -1480,6 +1492,10 @@
     <string name="keycombo_menu_navigate_next_paragraph">Navigate to next paragraph</string>
     <!-- Keyboard key combination assignment for Navigate to previous paragraph action [CHAR LIMIT=40] -->
     <string name="keycombo_menu_navigate_previous_paragraph">Navigate to previous paragraph</string>
+    <!-- Command in the Navigate by text category, for gestures and keyboard shortcuts: move back one sentence. [CHAR LIMIT=40] -->
+    <string name="shortcut_previous_sentence">Previous sentence</string>
+    <!-- Command in the Navigate by text category, for gestures and keyboard shortcuts: move forward one sentence. [CHAR LIMIT=40] -->
+    <string name="shortcut_next_sentence">Next sentence</string>
     <!-- Keyboard shortcuts: a second keyboard shortcut for moving to the next paragraph, besides the one of Next paragraph, such as P in browse mode in the NVDA keymap. [CHAR LIMIT=60] -->
     <string name="keycombo_menu_navigate_next_paragraph_second_key">Navigate to next paragraph, second key</string>
     <!-- Keyboard shortcuts: a second keyboard shortcut for moving to the previous paragraph, besides the one of Previous paragraph, such as Shift + P in browse mode in the NVDA keymap. [CHAR LIMIT=60] -->
@@ -2105,6 +2121,8 @@
     <string name="title_pref_typing_long_tap_duration">Touch and hold delay when typing</string>
     <!-- Title of the switch that makes touching and holding a keyboard key until the touch and hold delay ends press the key down until the finger lifts, so that keys such as Delete repeat. [CHAR_LIMIT=NONE] -->
     <string name="title_pref_typing_hold_keys_down">Hold keys down after the touch and hold delay</string>
+    <!-- Title of the switch that makes swipes while focus is on an on-screen keyboard key move to the next or previous key with every typing method. Off, they go on in the app from the text field, except with double-tap typing. [CHAR_LIMIT=NONE] -->
+    <string name="title_pref_typing_swipes_through_keys">Swipe from key to key with every typing method</string>
     <!--
       Source: Preference title.
       Description: This preference that shows current touch explore time out to exploration. [CHAR_LIMIT=60]
@@ -2409,6 +2427,12 @@
     <string name="speak_coordinates_value">X <xliff:g id="x" example="540">%1$d</xliff:g>, Y <xliff:g id="y" example="1200">%2$d</xliff:g></string>
     <!-- Spoken by Speak coordinates after it copies the coordinates of the focused item. coordinates is the text copied, such as X 540, Y 1200. [CHAR_LIMIT=NONE] -->
     <string name="speak_coordinates_copied"><xliff:g id="coordinates" example="X 540, Y 1200">%1$s</xliff:g>. Copied</string>
+    <!-- Spoken by Speak position for the cursor in the text of the focused item: the character after the cursor, the length of the text, and how far into the text the cursor is in percent. [CHAR_LIMIT=NONE] -->
+    <string name="speak_position_text">Character <xliff:g id="character" example="120">%1$d</xliff:g> of <xliff:g id="length" example="800">%2$d</xliff:g>, <xliff:g id="percent" example="15">%3$d</xliff:g>%%</string>
+    <!-- Spoken by Speak position for the cursor in text with more than one paragraph: the character after the cursor, the length of the text, the paragraph that the cursor is in, the number of paragraphs, and how far into the text the cursor is in percent. [CHAR_LIMIT=NONE] -->
+    <string name="speak_position_text_paragraph">Character <xliff:g id="character" example="120">%1$d</xliff:g> of <xliff:g id="length" example="800">%2$d</xliff:g>, paragraph <xliff:g id="paragraph" example="2">%3$d</xliff:g> of <xliff:g id="paragraphs" example="5">%4$d</xliff:g>, <xliff:g id="percent" example="15">%5$d</xliff:g>%%</string>
+    <!-- Spoken by Speak position: how far the list, page or other scrolling view around the focused item is scrolled, in percent, 0 at the start and 100 at the end. [CHAR_LIMIT=NONE] -->
+    <string name="speak_position_scroll">Scroll position <xliff:g id="percent" example="40">%1$d</xliff:g>%%</string>
     <!-- Label for the shortcut that tries to scroll current view forward. [CHAR_LIMIT=40] -->
     <string name="shortcut_scroll_forward">Scroll forward</string>
     <!-- Label for the shortcut that tries to scroll current view back. [CHAR_LIMIT=40] -->
@@ -2665,6 +2689,10 @@
     <string name="answer_call_no_call">No incoming call</string>
     <!-- Spoken when the Answer call shortcut runs before the user has allowed the screen reader to answer phone calls; Android then asks for that permission. [CHAR_LIMIT=60] -->
     <string name="answer_call_permission">Permission needed to answer calls</string>
+    <!-- Label for the shortcut that says the caller of the incoming phone call or app call, such as a WhatsApp call, that is ringing. [CHAR_LIMIT=40] -->
+    <string name="shortcut_say_caller">Say caller</string>
+    <!-- Spoken by Say caller while a call rings whose caller SandFly doesn't have. [CHAR_LIMIT=40] -->
+    <string name="say_caller_unknown">Incoming call</string>
     <!-- Label for the shortcut that ends the current phone call or app call, such as a WhatsApp call, or declines the call that is ringing. [CHAR_LIMIT=40] -->
     <string name="shortcut_end_call">End call</string>
     <!-- Spoken when the End call shortcut runs while no call is ringing or in progress. [CHAR_LIMIT=40] -->
@@ -2680,6 +2708,20 @@
     <string name="shortcut_lock_screen">Lock screen</string>
     <!-- Label for the shortcut that opens the system power menu. [CHAR_LIMIT=40] -->
     <string name="shortcut_power_menu">Power menu</string>
+    <!-- Label for the command that restarts the phone through Shizuku or root, after a dialog asks to confirm it. [CHAR_LIMIT=40] -->
+    <string name="shortcut_restart_phone">Restart phone</string>
+    <!-- Label for the command that turns the phone off through Shizuku or root, after a dialog asks to confirm it. [CHAR_LIMIT=40] -->
+    <string name="shortcut_power_off_phone">Power off phone</string>
+    <!-- Title of the dialog that Restart phone shows before it restarts the phone. [CHAR_LIMIT=NONE] -->
+    <string name="restart_phone_confirm_title">Restart the phone?</string>
+    <!-- The button of the Restart phone dialog that restarts the phone. [CHAR_LIMIT=NONE] -->
+    <string name="restart_phone_confirm_button">Restart</string>
+    <!-- Title of the dialog that Power off phone shows before it turns the phone off. [CHAR_LIMIT=NONE] -->
+    <string name="power_off_phone_confirm_title">Power off the phone?</string>
+    <!-- The button of the Power off phone dialog that turns the phone off. [CHAR_LIMIT=NONE] -->
+    <string name="power_off_phone_confirm_button">Power off</string>
+    <!-- Spoken when Restart phone or Power off phone fails through Shizuku or root, as the system power menu opens in its place. [CHAR_LIMIT=NONE] -->
+    <string name="power_command_failed">Failed, power menu opened</string>
     <!-- Label for the shortcut that opens the custom action menu. [CHAR_LIMIT=40] -->
     <string name="shortcut_show_custom_actions">Show custom actions</string>
     <!-- Label for the shortcut that opens the TalkBack context breakout menu [CHAR_LIMIT=100] -->
@@ -2925,6 +2967,8 @@
     <string name="title_copy_last_spoken_phrase">Copy last spoken phrase</string>
     <!-- Label for the command that sends the text in the focused edit box, with the app's send button or the keyboard's action. [CHAR_LIMIT=NONE] -->
     <string name="shortcut_submit_text">Submit text</string>
+    <!-- Label for the command that types a new line in a text field of several lines, or performs the action of a field of one line, such as Search, as Enter does. Also spoken after the new line is typed. [CHAR LIMIT=NONE] -->
+    <string name="shortcut_new_line">New line</string>
     <!-- Label for the command that removes all text from the focused edit box. [CHAR_LIMIT=NONE] -->
     <string name="shortcut_clear_text">Clear text</string>
     <!-- Label for the command that says how many characters and words the text in the focused edit box has. [CHAR LIMIT=NONE] -->
@@ -4283,8 +4327,8 @@
     <string name="title_pref_edge_menu_left_switch">Use the left edge as a menu</string>
     <!-- Title of the switch that makes one finger sliding up or down the right edge of the screen go through a menu of commands. [CHAR LIMIT=NONE]-->
     <string name="title_pref_edge_menu_right_switch">Use the right edge as a menu</string>
-    <!-- Title of the switch that makes an edge menu go across the screen: one finger slides in from the left or right edge, toward the middle of the screen, and the commands divide the width of the screen, instead of sliding up or down along the edge. [CHAR LIMIT=NONE]-->
-    <string name="title_pref_edge_menu_horizontal">Use horizontal edge menu</string>
+    <!-- Title of the switch, on the screen of the left or right edge menu, that makes the menu go across the screen: one finger slides in from that edge toward the middle of the screen, instead of sliding up or down along the edge. [CHAR LIMIT=NONE]-->
+    <string name="title_pref_edge_menu_horizontal">Slide in from the edge</string>
     <!-- Button that adds a command at the end of an edge menu. [CHAR LIMIT=NONE]-->
     <string name="edge_menu_add_command">Add command</string>
     <!-- Option that replaces a command of an edge menu with another. [CHAR LIMIT=NONE]-->
@@ -4339,6 +4383,16 @@
     <string name="value_focus_delay_150ms_default">0.15 seconds (default)</string>
     <!-- Label for a focus delay of 0.3 seconds, which isn't the default. [CHAR LIMIT=NONE]-->
     <string name="value_focus_delay_300ms">0.3 seconds</string>
+    <!-- Label for a focus delay of 0.5 seconds. [CHAR LIMIT=NONE]-->
+    <string name="value_focus_delay_500ms">0.5 seconds</string>
+    <!-- Label for a focus delay of 0.75 seconds. [CHAR LIMIT=NONE]-->
+    <string name="value_focus_delay_750ms">0.75 seconds</string>
+    <!-- Label for a focus delay of 1 seconds. [CHAR LIMIT=NONE]-->
+    <string name="value_focus_delay_1000ms">1 second</string>
+    <!-- Label for a focus delay of 1.5 seconds. [CHAR LIMIT=NONE]-->
+    <string name="value_focus_delay_1500ms">1.5 seconds</string>
+    <!-- Label for a focus delay of 2 seconds. [CHAR LIMIT=NONE]-->
+    <string name="value_focus_delay_2000ms">2 seconds</string>
 
     <!-- Title of the setting that activates the item under the finger when the finger is lifted. [CHAR LIMIT=NONE]-->
     <string name="title_pref_lift_to_activate">Lift to activate</string>
@@ -4512,6 +4566,28 @@
     <string name="title_pref_sandfly_keyboard_double_space_period">Double space types a period</string>
     <!-- Typing > Physical keyboard: with the SandFly keyboard, in a password field, SandFly speaks each character typed, deleted or passed over by the cursor, instead of "bullet". -->
     <string name="title_pref_speak_password_characters">Speak password characters</string>
+    <!-- Typing > Physical keyboard: with the SandFly keyboard, a misspelled word is replaced with its correction when Space, punctuation or Enter is typed after it. -->
+    <string name="title_pref_sandfly_keyboard_autocorrect">Auto-correct</string>
+    <!-- Typing > Physical keyboard: with the SandFly keyboard, Up and Down go through corrections and longer words for the word being typed. Also the name of the reading control. -->
+    <string name="title_pref_sandfly_keyboard_suggestions">Word suggestions</string>
+    <!-- Typing > Physical keyboard: when the SandFly keyboard says the correction Space would type, or the first word suggestion, while a word is typed: right after each key, after typing pauses for a time, or never. The values other than Off and Immediately are the pause, such as "0.5 seconds". -->
+    <string name="title_pref_sandfly_keyboard_suggestion_pause">Speak suggestion</string>
+    <!-- Speak suggestion: never. -->
+    <string name="value_sandfly_keyboard_suggestion_pause_off">Off</string>
+    <!-- Speak suggestion: right after the keyboard echo of each key typed. -->
+    <string name="value_sandfly_keyboard_suggestion_pause_immediately">Immediately</string>
+    <!-- Typing > Physical keyboard: with the SandFly keyboard, Enter, or the click of a trackpad that sends Enter, types the correction or suggestion just spoken for the word typed, instead of going to the app. -->
+    <string name="title_pref_sandfly_keyboard_enter_types_suggestion">Enter types the spoken suggestion</string>
+    <!-- Spoken when typing pauses within a word that Space would correct: the correction, such as "receive, correction". -->
+    <string name="sandfly_keyboard_pending_correction"><xliff:g id="word" example="receive">%1$s</xliff:g>, correction</string>
+    <!-- Typing > Physical keyboard: the language of the word list that auto-correct and word suggestions use. -->
+    <string name="title_pref_sandfly_keyboard_word_language">Word list language</string>
+    <!-- Word list language: the language of the system. -->
+    <string name="value_word_language_system">System language</string>
+    <!-- Typing > Physical keyboard: deletes the words that auto-correct and word suggestions learned from typing. -->
+    <string name="title_pref_sandfly_keyboard_delete_learned_words">Delete learned words</string>
+    <!-- Shown after Delete learned words. -->
+    <string name="sandfly_keyboard_learned_words_deleted">Learned words deleted</string>
     <!-- Summary of Speak password characters. -->
     <string name="summary_pref_speak_password_characters">With the SandFly keyboard, speaks the characters typed, deleted and passed over in password fields</string>
     <!-- Double-press characters: button that adds a key with the characters its double press types. -->
@@ -4546,6 +4622,24 @@
     <string name="shortcut_toggle_editing_mode">Turn editing mode on or off</string>
     <!-- Command: with the SandFly keyboard, spells the whole text of the password field being edited, one character at a time with its position. -->
     <string name="shortcut_spell_password_field">Spell the password field</string>
+    <!-- Command: with the SandFly keyboard, while a word is typed, says the next suggestion for it, a correction or a longer word. -->
+    <string name="shortcut_next_word_suggestion">Next word suggestion</string>
+    <!-- Command: with the SandFly keyboard, while a word is typed, says the previous suggestion for it. -->
+    <string name="shortcut_previous_word_suggestion">Previous word suggestion</string>
+    <!-- Command: with the SandFly keyboard, types the word suggestion said last, or the first one, in place of the word typed, with a space. -->
+    <string name="shortcut_type_word_suggestion">Type word suggestion</string>
+    <!-- Spoken when the word typed has no suggestions, or no word is being typed. -->
+    <string name="sandfly_keyboard_no_suggestions">No suggestions</string>
+    <!-- Spoken when a word suggestion command runs with Word suggestions turned off. -->
+    <string name="sandfly_keyboard_suggestions_off">Word suggestions off</string>
+    <!-- Spoken when a word suggestion command runs and there is no word list for the language. -->
+    <string name="sandfly_keyboard_no_word_list">No word list for this language</string>
+    <!-- Spoken after auto-correct replaced the word just typed: the word put in its place, such as "receive, corrected". -->
+    <string name="sandfly_keyboard_corrected"><xliff:g id="word" example="receive">%1$s</xliff:g>, corrected</string>
+    <!-- Spoken after Delete undid a correction: the word as it was typed, such as "recieve, correction undone". -->
+    <string name="sandfly_keyboard_correction_undone"><xliff:g id="word" example="recieve">%1$s</xliff:g>, correction undone</string>
+    <!-- Hint for the Word suggestions reading control, available while a word is typed with the SandFly keyboard. [CHAR LIMIT=NONE] -->
+    <string name="word_suggestions_hint">Swipe up or down to choose, then double-tap to type</string>
     <!-- One character of a spelled password field: its position, from 1, and its name, such as "2 capital B". The items are joined with commas. -->
     <string name="sandfly_keyboard_password_character"><xliff:g id="position" example="2">%1$d</xliff:g> <xliff:g id="character" example="capital B">%2$s</xliff:g></string>
     <!-- Spoken when Spell the password field runs in a text field that isn't a password field. -->
@@ -6532,4 +6626,16 @@
     <string name="deprecated_api_title"><xliff:g id="app" example="Example Game">%1$s</xliff:g> uses deprecated SandFly API names</string>
     <!-- One line of that notification for each deprecated name the app used: the deprecated name, then the name to use instead. [CHAR LIMIT=NONE] -->
     <string name="deprecated_api_replace">Replace <xliff:g id="deprecated_name" example="fyi.quin.backtalk.action.SPEAK">%1$s</xliff:g> with <xliff:g id="name" example="io.github.aaron_gh.sandfly.action.SPEAK">%2$s</xliff:g>.</string>
+  <!-- Image and screen descriptions settings: title of the screen that lists the languages written in Cyrillic, such as Russian and Ukrainian, whose text recognition models can be downloaded and deleted there. [CHAR LIMIT=NONE] -->
+  <string name="title_pref_cyrillic_text_recognition">Cyrillic text recognition</string>
+  <!-- Spoken once after SandFly starts, when text in an image or on the screen is recognized for a language written in Cyrillic whose text recognition model isn't downloaded, so only Latin letters are read. The language's name, such as Russian, is filled in. "Image and screen descriptions" and "Cyrillic text recognition" are the titles of the settings screens where the model is downloaded. [CHAR LIMIT=NONE] -->
+  <string name="cyrillic_text_model_missing">No text recognition model for <xliff:g id="language" example="Russian">%1$s</xliff:g>. Download it in Image and screen descriptions, Cyrillic text recognition.</string>
+  <!-- Cyrillic text recognition settings: shown under a language when the server that has the text recognition models refused the download. [CHAR LIMIT=NONE] -->
+  <string name="cyrillic_text_model_error_http">The download server did not accept the request. Try again later.</string>
+  <!-- Heading on the Voice commands settings screen of the voice commands said that SandFly didn't understand 3 times, each of which can be made a custom voice command. [CHAR LIMIT=40] -->
+  <string name="voice_phrases_not_understood">Phrases not understood</string>
+  <!-- Switch under Phrases not understood on the Voice commands settings screen: counts the voice commands that SandFly doesn't understand and lists those not understood 3 times. Off forgets them. [CHAR LIMIT=60] -->
+  <string name="title_pref_voice_phrases_not_understood">Save phrases not understood</string>
+  <!-- Spoken after the message that a voice command isn't recognized, when it is the 3rd time and the phrase is now listed under Phrases not understood in the Voice commands settings. "Phrases not understood" is the heading of that list. [CHAR LIMIT=NONE] -->
+  <string name="voice_phrases_not_understood_listed">Added to Phrases not understood.</string>
 </resources>

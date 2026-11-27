@@ -167,6 +167,7 @@ import com.google.android.accessibility.talkback.braille.TalkBackForBrailleDispl
 import com.google.android.accessibility.talkback.braille.TalkBackForBrailleImeImpl;
 import com.google.android.accessibility.talkback.braille.TalkBackForBrailleImeImpl.TalkBackPrivateMethodProvider;
 import com.google.android.accessibility.talkback.commands.RemovedCommands;
+import com.google.android.accessibility.talkback.calls.CallerAnnouncer;
 import com.google.android.accessibility.talkback.clipboard.ClipboardHistoryOverlay;
 import com.google.android.accessibility.talkback.compositor.ActionsAvailable;
 import com.google.android.accessibility.talkback.compositor.ClickFeedback;
@@ -180,6 +181,7 @@ import com.google.android.accessibility.talkback.compositor.roledescription.Role
 import com.google.android.accessibility.talkback.contextmenu.ListMenuManager;
 import com.google.android.accessibility.talkback.controller.TelevisionNavigationController;
 import com.google.android.accessibility.talkback.controlsounds.ControlSoundsSettings;
+import com.google.android.accessibility.talkback.dictation.DictationSettings;
 import com.google.android.accessibility.talkback.dictation.RecognitionModelKeeper;
 import com.google.android.accessibility.talkback.dictation.SandflyDictation;
 import com.google.android.accessibility.talkback.directtouch.DirectTouchController;
@@ -216,6 +218,7 @@ import com.google.android.accessibility.talkback.focusmanagement.interpreter.Tou
 import com.google.android.accessibility.talkback.focusmanagement.record.AccessibilityFocusActionHistory;
 import com.google.android.accessibility.talkback.focusmanagement.record.FocusActionInfo;
 import com.google.android.accessibility.talkback.gesture.AccelerometerGestures;
+import com.google.android.accessibility.talkback.gesture.GboardPopupNotes;
 import com.google.android.accessibility.talkback.gesture.GestureController;
 import com.google.android.accessibility.talkback.gesture.GestureLayout;
 import com.google.android.accessibility.talkback.gesture.GestureLayoutActivity;
@@ -223,7 +226,9 @@ import com.google.android.accessibility.talkback.gesture.GestureHistory;
 import com.google.android.accessibility.talkback.gesture.GestureProfiles;
 import com.google.android.accessibility.talkback.gesture.GestureShortcutMapping;
 import com.google.android.accessibility.talkback.gesture.KeyboardHover;
+import com.google.android.accessibility.talkback.gesture.PowerCommands;
 import com.google.android.accessibility.talkback.gesture.SyntheticTouches;
+import com.google.android.accessibility.talkback.gesture.TextTraversalTracker;
 import com.google.android.accessibility.talkback.touchlock.TouchLock;
 import com.google.android.accessibility.talkback.gesture.TwoFingerRotationTracker;
 import com.google.android.accessibility.talkback.gesture.VibrationWatchGestureSettings;
@@ -336,6 +341,7 @@ import com.google.android.accessibility.talkback.utils.TalkbackFeatureSupport;
 import com.google.android.accessibility.talkback.utils.VerbosityPreferences;
 import com.google.android.accessibility.utils.AccessibilityEventListener;
 import com.google.android.accessibility.utils.monitor.RecentUserInput;
+import com.google.android.accessibility.utils.ocr.LanguageTextRecognizer;
 import com.google.android.accessibility.utils.output.OutputMute;
 import com.google.android.accessibility.utils.AccessibilityEventUtils;
 import com.google.android.accessibility.utils.AccessibilityNodeInfoUtils;
@@ -397,6 +403,7 @@ import com.google.android.accessibility.utils.output.FeedbackProcessingUtils;
 import com.google.android.accessibility.utils.output.ScrollActionRecord;
 import com.google.android.accessibility.utils.output.SelectionStateReader;
 import com.google.android.accessibility.utils.output.SpeechController;
+import com.google.android.accessibility.utils.output.SpeechController.SpeakOptions;
 import com.google.android.accessibility.utils.output.SpeechController.UtteranceCompleteRunnable;
 import com.google.android.accessibility.utils.output.SpeechCleanupUtils;
 import com.google.android.accessibility.utils.output.SpeechControllerImpl;
@@ -766,6 +773,9 @@ public class TalkBackService extends AccessibilityServiceCompat
   /** Monitors the call state for the phone device. */
   private CallStateMonitor callStateMonitor;
 
+  /** Announce caller repeats and the Say caller command. */
+  private @Nullable CallerAnnouncer callerAnnouncer;
+
   /** Monitors voice actions from other applications */
   private VoiceActionMonitor voiceActionMonitor;
 
@@ -961,6 +971,11 @@ public class TalkBackService extends AccessibilityServiceCompat
   private static final int VOLUME_KEY_MOVES_CURSOR = 2;
   private int volumeUpKeyUse = VOLUME_KEY_CHANGES_VOLUME;
   private int volumeDownKeyUse = VOLUME_KEY_CHANGES_VOLUME;
+  // What the presses of VolumeUp or VolumeDown being counted by volumeKeyCommands do when they run
+  // no command, instead of changing the volume: a key with a press command moves the cursor or
+  // adjusts the slider only once its presses are known to run none.
+  private int volumeUpDeferredUse = VOLUME_KEY_CHANGES_VOLUME;
+  private int volumeDownDeferredUse = VOLUME_KEY_CHANGES_VOLUME;
 
   /** "Volume keys adjust sliders" setting. */
   private boolean volumeKeysAdjustSliders = false;
@@ -1175,6 +1190,9 @@ public class TalkBackService extends AccessibilityServiceCompat
     }
     SpeechControl.detach();
     NotificationReader.detach();
+    if (callerAnnouncer != null) {
+      callerAnnouncer.shutdown();
+    }
     NotificationListService.onSandFlyStopped();
 
     if (oneUiVolumeKeys != null) {
@@ -1230,6 +1248,7 @@ public class TalkBackService extends AccessibilityServiceCompat
     }
     HandwritingKeyboardHost.setFeedback(null);
     SandFlyKeyboardHost.setFeedback(null);
+    SandFlyKeyboardHost.setSuggestionStopper(null);
     TutorialHooks.setFeedback(null);
     instance = null;
     // Shutdown and unregister all components.
@@ -1342,6 +1361,32 @@ public class TalkBackService extends AccessibilityServiceCompat
         });
   }
 
+  /**
+   * Says that Cyrillic text in {@code language} was read with the Latin recognizer, since its
+   * model isn't downloaded. Said once each time the screen reader starts. Called from any thread.
+   */
+  private void speakMissingTextModel(Locale language) {
+    String text =
+        getString(
+            R.string.cyrillic_text_model_missing, language.getDisplayLanguage(Locale.getDefault()));
+    new Handler(Looper.getMainLooper())
+        .post(
+            () -> {
+              if (pipeline != null) {
+                // Not cut off by the recognized text that follows.
+                pipeline
+                    .getFeedbackReturner()
+                    .returnFeedback(
+                        EVENT_ID_UNTRACKED,
+                        Feedback.speech(
+                            text,
+                            SpeakOptions.create()
+                                .setQueueMode(
+                                    SpeechController.QUEUE_MODE_UNINTERRUPTIBLE_BY_NEW_SPEECH)));
+              }
+            });
+  }
+
   /** Says why the model on the phone could not answer, such as low memory. */
   private void speakOnDeviceAiProblem(String text) {
     if (pipeline != null) {
@@ -1412,6 +1457,7 @@ public class TalkBackService extends AccessibilityServiceCompat
       FocusProcessorForLogicalNavigation.onScrollEventReceived(event);
     }
     HiddenFieldEcho.onAccessibilityEvent(event);
+    GboardPopupNotes.onEventReceived(event);
     ScrollAhead.onAccessibilityEvent(event);
     if (event.getEventType() == AccessibilityEvent.TYPE_TOUCH_INTERACTION_START) {
       ScrollEventInterpreter.onTouchInteractionStart();
@@ -1462,7 +1508,7 @@ public class TalkBackService extends AccessibilityServiceCompat
       // keyboard, the volume panel and the notification shade send this event too, and closing
       // them sends none for the app under them.
       int windowType = AccessibilityEventUtils.getWindowType(event);
-      if (isAppWindowType(windowType, lastWindowPackage)) {
+      if (isAppWindowType(windowType, lastWindowPackage) && showsWindow(event)) {
         SpeechDictionary.onWindowShown(lastWindowPackage);
         AppGestures.onWindowShown(lastWindowPackage);
         // An event from SandFly whose window can't be told may be one of its overlays; the window
@@ -1492,6 +1538,11 @@ public class TalkBackService extends AccessibilityServiceCompat
         if (AppSpeechFilter.watchesKeyboards()) {
           AppSpeechFilter.onKeyboardShown(keyboard);
         }
+      }
+      // An assistant records what the user says as soon as its window is shown, along with any
+      // speech that is playing.
+      if (AppSpeechFilter.onWindowsChanged(this)) {
+        interruptAllFeedback(/* stopTtsSpeechCompletely= */ false);
       }
     }
     if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
@@ -1933,6 +1984,9 @@ public class TalkBackService extends AccessibilityServiceCompat
             keyEvent, () -> volumeKeyCommandsOffReason(triggerModifierPressed, keyCode))) {
       return true;
     }
+    if (useDeferredVolumeKeyNow(keyEvent)) {
+      return true;
+    }
     if (oneUiVolumeKeys != null
         && oneUiVolumeKeys.onKeyEvent(
             keyEvent, () -> canUseVolumeKeyPresses(triggerModifierPressed))) {
@@ -2047,7 +2101,7 @@ public class TalkBackService extends AccessibilityServiceCompat
    * Returns null when double, triple and long presses of the volume key {@code keyCode} run their
    * commands now, and otherwise why they don't. They run as for {@link #canUseVolumeKeyPresses},
    * and also while an always-on display shows the lock screen. While a call rings, only a key with
-   * Answer call or End call among its presses' commands is counted.
+   * Answer call, End call or Say caller among its presses' commands is counted.
    */
   private @Nullable String volumeKeyCommandsOffReason(boolean triggerModifierPressed, int keyCode) {
     String reason =
@@ -2066,14 +2120,16 @@ public class TalkBackService extends AccessibilityServiceCompat
   }
 
   /**
-   * Whether a call rings and a press of the volume key {@code keyCode} has Answer call or End call.
+   * Whether a call rings and a press of the volume key {@code keyCode} has Answer call, End call or
+   * Say caller.
    */
   private boolean isRingingCallAnsweredBy(int keyCode) {
     return volumeKeyCommands != null
         && voiceActionMonitor != null
         && voiceActionMonitor.getCurrentCallState() == TelephonyManager.CALL_STATE_RINGING
         && (volumeKeyCommands.hasCommand(keyCode, getString(R.string.shortcut_value_answer_call))
-            || volumeKeyCommands.hasCommand(keyCode, getString(R.string.shortcut_value_end_call)));
+            || volumeKeyCommands.hasCommand(keyCode, getString(R.string.shortcut_value_end_call))
+            || volumeKeyCommands.hasCommand(keyCode, getString(R.string.shortcut_value_say_caller)));
   }
 
   private boolean canTakeVolumeKeys(boolean triggerModifierPressed) {
@@ -2123,7 +2179,8 @@ public class TalkBackService extends AccessibilityServiceCompat
    * moves the cursor back and volume down moves it on. Volume keys pressed while touching the
    * screen, with the keyboard shortcut modifier, or during continuous reading keep adjusting speech
    * volume. The key up that ends a press which adjusted the slider or moved the cursor is consumed
-   * too.
+   * too. A key with a press command is left to volumeKeyCommands, which moves the cursor or adjusts
+   * the slider for presses that run no command.
    */
   private boolean adjustSliderWithVolumeKey(KeyEvent keyEvent, boolean triggerModifierPressed) {
     int keyCode = keyEvent.getKeyCode();
@@ -2164,16 +2221,62 @@ public class TalkBackService extends AccessibilityServiceCompat
           use = VOLUME_KEY_MOVES_CURSOR;
         }
       }
+      int deferred = VOLUME_KEY_CHANGES_VOLUME;
+      if (use != VOLUME_KEY_CHANGES_VOLUME
+          && volumeKeyCommands != null
+          && volumeKeyCommands.hasAnyCommand(keyCode)) {
+        // Left to volumeKeyCommands, which counts the presses first so that a long, double or
+        // triple press can run its command.
+        deferred = use;
+        use = VOLUME_KEY_CHANGES_VOLUME;
+      }
       if (isUp) {
         volumeUpKeyUse = use;
+        volumeUpDeferredUse = deferred;
       } else {
         volumeDownKeyUse = use;
+        volumeDownDeferredUse = deferred;
       }
     }
     int use = isUp ? volumeUpKeyUse : volumeDownKeyUse;
     if (use == VOLUME_KEY_CHANGES_VOLUME) {
       return false;
     }
+    moveCursorOrAdjustSlider(isUp, use);
+    return true;
+  }
+
+  /**
+   * When volumeKeyCommands didn't keep a press that was left to it, such as during a call, moves
+   * the cursor or adjusts the slider at once, as for a key with no press command, and returns
+   * whether it did. The repeats and release of the press then go to {@link
+   * #adjustSliderWithVolumeKey}.
+   */
+  private boolean useDeferredVolumeKeyNow(KeyEvent keyEvent) {
+    int keyCode = keyEvent.getKeyCode();
+    boolean isUp = keyCode == KeyEvent.KEYCODE_VOLUME_UP;
+    if ((!isUp && keyCode != KeyEvent.KEYCODE_VOLUME_DOWN)
+        || keyEvent.getAction() != KeyEvent.ACTION_DOWN
+        || keyEvent.getRepeatCount() != 0) {
+      return false;
+    }
+    int deferred = isUp ? volumeUpDeferredUse : volumeDownDeferredUse;
+    if (deferred == VOLUME_KEY_CHANGES_VOLUME) {
+      return false;
+    }
+    if (isUp) {
+      volumeUpKeyUse = deferred;
+      volumeUpDeferredUse = VOLUME_KEY_CHANGES_VOLUME;
+    } else {
+      volumeDownKeyUse = deferred;
+      volumeDownDeferredUse = VOLUME_KEY_CHANGES_VOLUME;
+    }
+    moveCursorOrAdjustSlider(isUp, deferred);
+    return true;
+  }
+
+  /** Moves the cursor by a character, or adjusts the slider, as a volume key press does. */
+  private void moveCursorOrAdjustSlider(boolean isUp, int use) {
     if (use == VOLUME_KEY_MOVES_CURSOR) {
       pipeline
           .getFeedbackReturner()
@@ -2185,7 +2288,7 @@ public class TalkBackService extends AccessibilityServiceCompat
                           : TraversalStrategy.SEARCH_FOCUS_FORWARD)
                   .setInputMode(InputModeTracker.INPUT_MODE_KEYBOARD)
                   .setGranularity(CursorGranularity.CHARACTER));
-      return true;
+      return;
     }
     pipeline
         .getFeedbackReturner()
@@ -2194,7 +2297,17 @@ public class TalkBackService extends AccessibilityServiceCompat
             Feedback.adjustValue(
                 isUp ? Feedback.AdjustValue.Action.INCREASE_VALUE
                     : Feedback.AdjustValue.Action.DECREASE_VALUE));
-    return true;
+  }
+
+  private int deferredVolumeKeyUse(int keyCode) {
+    switch (keyCode) {
+      case KeyEvent.KEYCODE_VOLUME_UP:
+        return volumeUpDeferredUse;
+      case KeyEvent.KEYCODE_VOLUME_DOWN:
+        return volumeDownDeferredUse;
+      default:
+        return VOLUME_KEY_CHANGES_VOLUME;
+    }
   }
 
   private boolean isBrailleImeTouchInteracting() {
@@ -2217,6 +2330,14 @@ public class TalkBackService extends AccessibilityServiceCompat
       processorVolumeStream.forgetTouchInteraction();
     }
     NotificationReader.onTouchEnded();
+  }
+
+  /** Finds an item in a native list whose scroll moved the old focus off screen. */
+  public @Nullable AccessibilityNodeInfoCompat itemInRecentlyScrolledList(
+      @TraversalStrategy.SearchDirectionOrUnknown int direction) {
+    return accessibilityFocusInterpreter == null
+        ? null
+        : accessibilityFocusInterpreter.itemInRecentlyScrolledList(direction);
   }
 
   @Override
@@ -2339,6 +2460,11 @@ public class TalkBackService extends AccessibilityServiceCompat
     }
 
     return feedbackController;
+  }
+
+  /** Announce caller repeats and the Say caller command, or null before SandFly has started. */
+  public @Nullable CallerAnnouncer getCallerAnnouncer() {
+    return callerAnnouncer;
   }
 
   public VoiceActionMonitor getVoiceActionMonitor() {
@@ -2804,6 +2930,26 @@ public class TalkBackService extends AccessibilityServiceCompat
   }
 
   /**
+   * Notes a Back that one of SandFly's own screens runs, such as its settings showing the screen
+   * before in the same window, so that focus returns to the item activated there. Called on the
+   * main thread before the screen changes.
+   */
+  public static void onBackInOwnScreen() {
+    TalkBackService service = instance;
+    if (service != null && service.focuser != null) {
+      service.focuser.onBackInApp();
+    }
+  }
+
+  /** Ends a Back noted by {@link #onBackInOwnScreen}, given up before it ran. */
+  public static void onBackCancelledInOwnScreen() {
+    TalkBackService service = instance;
+    if (service != null && service.focuser != null) {
+      service.focuser.onBackCancelled();
+    }
+  }
+
+  /**
    * Keeps the volume monitor from announcing a volume change that SandFly made and has spoken
    * itself, such as in its quick settings panel.
    */
@@ -2865,6 +3011,7 @@ public class TalkBackService extends AccessibilityServiceCompat
    */
   private void initializeInfrastructure() {
     ConcurrentNodeQueries.start();
+    LanguageTextRecognizer.setMissingModelListener(this::speakMissingTextModel);
     FocusActionRecord.startNodeQueries();
     ScrollEventInterpreter.resetNavigation();
     // TODO: we still need it keep true for TV until TouchExplore and Accessibility focus is
@@ -3334,6 +3481,13 @@ public class TalkBackService extends AccessibilityServiceCompat
             this);
     callStateMonitor.addCallStateChangedListener(
         CallDurationAnnouncer.create(this, pipeline.getFeedbackReturner()));
+    callerAnnouncer =
+        CallerAnnouncer.create(
+            this,
+            pipeline.getFeedbackReturner(),
+            callStateMonitor::getCurrentCallState,
+            () -> speechController != null && speechController.isSpeaking());
+    callStateMonitor.addCallStateChangedListener(callerAnnouncer);
     if (speechCacheController != null) {
       ringerModeAndScreenMonitor.addScreenChangedListener(speechCacheController);
     }
@@ -3367,7 +3521,21 @@ public class TalkBackService extends AccessibilityServiceCompat
             () ->
                 (oneUiVolumeKeys != null)
                     ? oneUiVolumeKeys.suggestedStream()
-                    : AudioManager.USE_DEFAULT_STREAM_TYPE);
+                    : AudioManager.USE_DEFAULT_STREAM_TYPE,
+            new VolumeKeyCommands.VolumeChangeReplacement() {
+              @Override
+              public boolean replaces(int keyCode) {
+                return deferredVolumeKeyUse(keyCode) != VOLUME_KEY_CHANGES_VOLUME;
+              }
+
+              @Override
+              public void replace(int keyCode) {
+                int use = deferredVolumeKeyUse(keyCode);
+                if (use != VOLUME_KEY_CHANGES_VOLUME) {
+                  moveCursorOrAdjustSlider(keyCode == KeyEvent.KEYCODE_VOLUME_UP, use);
+                }
+              }
+            });
     ringerModeAndScreenMonitor.addScreenChangedListener(
         (isInteractive, eventId) -> {
           if (!isInteractive) {
@@ -3451,6 +3619,10 @@ public class TalkBackService extends AccessibilityServiceCompat
             screenStateMonitor.state,
             processorPhoneticLetters);
 
+    TextTraversalTracker textTraversalTracker = new TextTraversalTracker();
+    addEventListener(textTraversalTracker);
+    gestureController.setPositionSources(scrollEventInterpreter, textTraversalTracker);
+
     keyComboManager.setCommandPerformer(gestureController::performAction);
 
     pauseController =
@@ -3490,6 +3662,7 @@ public class TalkBackService extends AccessibilityServiceCompat
     // in the order they are added.
     eventFilter =
         new EventFilter(this, compositor, touchMonitor, globalVariables, earlyFocusSpeech);
+    eventFilter.setCallerAnnouncer(callerAnnouncer);
     focuser.setFocusSetListener(
         new FocusManagerInternal.FocusSetListener() {
           @Override
@@ -3560,10 +3733,29 @@ public class TalkBackService extends AccessibilityServiceCompat
     // So does a keyboard that speaks through SandFly and says so.
     textEventFilter.setOnScreenKeyboardEchoSuppressor(() -> KeyboardSpeech.isTypingSpoken(this));
     // Dictation that speaks the text it types.
-    textEventFilter.setTextChangeSuppressor(SandflyDictation::typedSpokenText);
+    // And edits that say what they changed, such as text typed by voice.
+    textEventFilter.setTextChangeSuppressor(
+        eventTime ->
+            SandflyDictation.typedSpokenText(eventTime)
+                || editTextActionHistory.hasSpokenEditAtTime(eventTime));
     // The SandFly keyboard, which says the characters of a password field with Speak password
     // characters on.
     textEventFilter.setPasswordCharacterSuppressor(SandFlyKeyboardHost::speaksPasswordCharacters);
+    // The SandFly keyboard's corrections and word suggestions, which it says.
+    textEventFilter.setKeyboardEditSuppressor(SandFlyKeyboardHost::isKeyboardEdit);
+    // The SandFly keyboard's suggestion said right after the keyboard echo of a key.
+    textEventFilter.setTextChangeHandledListener(SandFlyKeyboardHost::onTextChangeHandled);
+    // Text changes after typing from Gboard's popup of alternative characters, for problem reports.
+    textEventFilter.addListener(
+        interpretation -> GboardPopupNotes.onTextEventKept(interpretation.event));
+    SandFlyKeyboardHost.setSuggestionStopper(
+        () -> {
+          if (speechController != null) {
+            speechController.stopUtteranceGroup(
+                SpeechController.UTTERANCE_GROUP_KEYBOARD_SUGGESTIONS);
+          }
+          return kotlin.Unit.INSTANCE;
+        });
     textEventFilter.setBrailleInputReader(
         () -> {
           BrailleImeForTalkBack brailleIme = getBrailleImeForTalkBack();
@@ -4125,8 +4317,12 @@ public class TalkBackService extends AccessibilityServiceCompat
     KeyboardEchoSettings.migrate(this, prefs);
     // Combines the two window name switches into the Window names setting.
     WindowNamesSetting.migrate(prefs, getResources());
+    // The switch for "emoji" after emoji names became After emoji names, with a sound.
+    EmojiSpeech.migrateSuffix(prefs);
     // The battery switch for when the screen turns on became a list with Only while charging.
     ScreenAnnouncementSettings.migrateBattery(prefs);
+    // Speak dictated text became on by default.
+    DictationSettings.migrateSpeakTextDefault(prefs);
     // Verbosity's switch for notifications with the screen off became the Notifications one.
     NotificationSettings.migrateScreenOff(
         prefs,
@@ -4365,6 +4561,7 @@ public class TalkBackService extends AccessibilityServiceCompat
     if (imageCaptioner != null) {
       imageCaptioner.shutdown();
     }
+    LanguageTextRecognizer.setMissingModelListener(null);
 
     if (proximitySensorMonitor != null) {
       proximitySensorMonitor.shutdown();
@@ -4766,6 +4963,10 @@ public class TalkBackService extends AccessibilityServiceCompat
     globalVariables.setTypingMethod(accessibilityFocusInterpreter.getTypingMethod());
     FocusProcessorForLogicalNavigation.setTypingMethod(
         accessibilityFocusInterpreter.getTypingMethod());
+    FocusProcessorForLogicalNavigation.setSwipesThroughKeys(
+        getBooleanPref(
+            R.string.pref_typing_swipes_through_keys_key,
+            R.bool.pref_typing_swipes_through_keys_default));
 
     applyTouchExplorationPreference();
 
@@ -4816,8 +5017,10 @@ public class TalkBackService extends AccessibilityServiceCompat
         getBooleanPref(
             R.string.pref_punctuation_none_keep_meaning_key,
             R.bool.pref_punctuation_none_keep_meaning_default));
-    // Before the mode, which keeps the emoji loaded while emoji have a voice or rate of their own.
+    // Before the mode, which keeps the emoji loaded while emoji have a voice or rate of their own,
+    // or a sound after them.
     EmojiSpeech.setVoice(prefs);
+    EmojiSpeech.setAfterName(prefs);
     EmojiSpeech.setMode(
         this,
         SharedPreferencesUtils.getStringPref(
@@ -4829,8 +5032,6 @@ public class TalkBackService extends AccessibilityServiceCompat
                 res,
                 R.string.pref_emoji_repeat_count_key,
                 R.string.pref_emoji_repeat_count_default)));
-    EmojiSpeech.setSuffix(
-        getBooleanPref(R.string.pref_emoji_suffix_key, R.bool.pref_emoji_suffix_default));
 
     int formattingOptions = TextFormattingUtils.OPTION_NONE;
     int formattingFeedbackMode = TextFormattingUtils.FEEDBACK_MODE_NONE;
@@ -5846,6 +6047,7 @@ public class TalkBackService extends AccessibilityServiceCompat
   }
 
   public void onShutDown() {
+    PowerCommands.onShutDown();
     if (shouldLogAliveTime()) {
       analytics.sendAliveTimeLog();
     }
@@ -6461,6 +6663,16 @@ public class TalkBackService extends AccessibilityServiceCompat
       default:
         return false;
     }
+  }
+
+  /**
+   * Whether a window state change shows a window or pane, rather than reporting a change of text or
+   * content inside one, such as the clock of vivo's System UI plugin every minute.
+   */
+  private static boolean showsWindow(AccessibilityEvent event) {
+    int types = event.getContentChangeTypes();
+    return types == AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+        || (types & AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED) != 0;
   }
 
   /**

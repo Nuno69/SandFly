@@ -10,7 +10,7 @@ To open the typing settings, go to **Typing** in SandFly settings. The screen ha
 
 - **Keyboard echo**: what SandFly reads as you type with each kind of keyboard. See [](#typing-keyboard-echo).
 - **Double-tap moves cursor to start or end**. See [](#typing-double-tap-cursor).
-- **On-screen keyboard**: **Typing method**, **Touch and hold delay when typing**, **Hold keys down after the touch and hold delay**, **Typing focus delay** and **Announce keyboard keys faster**. See [](#typing-on-screen-keyboard).
+- **On-screen keyboard**: **Typing method**, **Swipe from key to key with every typing method**, **Touch and hold delay when typing**, **Hold keys down after the touch and hold delay**, **Typing focus delay** and **Announce keyboard keys faster**. See [](#typing-on-screen-keyboard).
 - **Physical keyboard**: shown only while a physical keyboard is connected. See [](#typing-physical-keyboard).
 - **Other ways to type**: **Dictation**, **Handwriting keyboard** and **Wait after writing**. See [](#typing-dictation) and [](#typing-handwriting).
 
@@ -62,7 +62,7 @@ You can also change the delay while you type with the **Typing focus delay** rea
 
 #### Swipes and the keyboard {#typing-swipes-keyboard}
 
-Swipes from an app, the status bar or the navigation bar never move focus into the keyboard. With any typing method except **Hold finger to select any key, then double-tap**, a swipe while focus is on a key goes on in the app, from the text field that you are typing in. With the double-tap method, swipes move through the keys. Swipes from inside the keyboard can still leave it.
+Swipes from an app, the status bar or the navigation bar never move focus into the keyboard. With any typing method except **Hold finger to select any key, then double-tap**, a swipe while focus is on a key goes on in the app, from the text field that you are typing in. With the double-tap method, swipes move through the keys. With **Typing** > **Swipe from key to key with every typing method** on, swipes move through the keys with every typing method. It is off by default. Swipes from inside the keyboard can still leave it.
 
 ### Keyboard echo {#typing-keyboard-echo}
 
@@ -96,6 +96,8 @@ With **Typing** > **Double-tap moves cursor to start or end** on, a double-tap o
 - When the cursor isn't at the start, a double-tap moves it to the start of the text, and SandFly announces "Beginning of field".
 - When the cursor is at the start, a double-tap moves it to the end, and SandFly announces "End of field".
 
+The **Activate** command does the same when it runs from another gesture, a voice command, a braille command or a script.
+
 In any other control, or in a text field without input focus and a shown keyboard, a double-tap activates the item as usual. The setting is off by default, and is available on Android 13 and later.
 
 ### Select, copy, cut and paste {#typing-select-copy-paste}
@@ -106,6 +108,8 @@ In any other control, or in a text field without input focus and a shown keyboar
 2. Run **Start or end selection mode**. SandFly announces "Selection mode on".
 3. Move the cursor with a reading control, such as **Characters** or **Words**. The text that the cursor passes is selected.
 4. Run **Start or end selection mode** again to end selection mode.
+
+In the NVDA keymap, **Start or end selection mode** is SandFly key + F9. In the SandFly keymap, it is SandFly key + Shift + S.
 
 **Select all** selects all the text in the field, and **Clear selection** removes the selection.
 
@@ -131,6 +135,7 @@ The **Editing menu** command opens a menu of **Clipboard history**, **Copy**, **
 The **Text editing** group of **Commands** also has:
 
 - **Submit text**: presses the key that sends or submits the text in the keyboard, such as Send, Search or Done.
+- **New line**: does what Enter does. In a text field of several lines, it types a new line at the cursor and SandFly says "New line". In a text field of one line, it performs the action of the field, such as Search or Next, or else does what **Submit text** does. By voice, also "new paragraph" or "press enter".
 - **Clear text**: deletes all the text in the text field.
 - **Character count**: reads the length of the text, such as "12 characters, 3 words". In a password field, only the characters are counted.
 - **Read text field**: reads the whole text of the text field, or "Empty" and the hint when it has no text.
@@ -138,7 +143,7 @@ The **Text editing** group of **Commands** also has:
 - **Dictate**: see [](#typing-dictate).
 - **Start voice editing**: records voice commands for the text field one after another. See [](#voice-commands-editing).
 - **Switch keyboard**: changes to the next keyboard. Available on Android 11 and later.
-- **Search emoji**, **Choose a symbol**, **Turn editing mode on or off** and **Spell the password field**: commands of the SandFly keyboard. See [](#keyboards).
+- **Search emoji**, **Choose a symbol**, **Turn editing mode on or off**, **Spell the password field**, **Next word suggestion**, **Previous word suggestion** and **Type word suggestion**: commands of the SandFly keyboard. See [](#keyboards).
 
 None of these commands has a gesture by default. To give one a gesture, see [](#commands).
 
@@ -197,7 +202,7 @@ Recording stops by itself after 15 minutes, or after a time of silence that you 
 
 By default, a two-finger double-tap runs **Dictate, play or pause media**. It starts **Dictate** when a text field has input focus, a keyboard is shown or connected, and no call is active; it stops a dictation that is recording; otherwise it plays or pauses media. For the default gestures, see [](#appendix-gestures).
 
-On phones with a mute key, such as the Zinwa Q25, hold the mute key in a text field to dictate: recording starts when you press the key and stops when you release it. See [](#buttons-mute-key).
+On phones with a mute key, such as the Zinwa Q25, hold the mute key in a text field to dictate: recording starts when you press the key and stops when you release it. The setting is **Volume keys** > **Hold mute key to dictate in text fields**, on by default. See [](#buttons-mute-key).
 
 #### Choose how speech is recognized {#typing-speech-recognition}
 
@@ -210,6 +215,8 @@ Go to **Typing** > **Dictation** > **Speech recognition**, and choose one of the
 - **Android speech recognition**: the speech recognition service chosen in Android settings.
 
 A choice that can't be used falls back to the same order as **Automatic**. Google on-device and Android speech recognition start again after each pause until you stop dictation. If Rambler doesn't respond, the recording is transcribed with Whisper when a model is downloaded.
+
+**Dictate** recognizes the language of the keyboard, such as the language chosen in Gboard, when it differs from the language of the phone. Google on-device speech recognition then needs a language pack for the language of the keyboard; without one, the next way of recognizing speech in the **Automatic** order is used. Voice commands and other voice input use the language of the phone.
 
 With **Rambler live transcription** on, SandFly streams the recording while you speak, and receives the text of each phrase when you pause, so the text is typed sooner after you stop. If the stream fails, SandFly sends the whole recording when you stop. It's on by default, and shown only when there is a Gemini API key.
 
@@ -227,7 +234,7 @@ To use a model:
 1. Choose a model. SandFly downloads it, after a confirmation on mobile data.
 2. To change to another downloaded model, choose it, then choose **Use**. To remove a model, choose it, then choose **Delete**.
 
-The first model that you download is used. Whisper uses the language of the phone when it is known, and otherwise detects the language.
+The first model that you download is used. Whisper recognizes the language described in [](#typing-speech-recognition).
 
 **Model file** adds a Whisper model of your own in the whisper.cpp format, such as one trained for a language, from the files on the phone, up to 4 GB. Once added, you can use it, replace it with **Choose another file**, or delete it. A file that isn't a whisper.cpp model is refused.
 
@@ -249,7 +256,7 @@ In **Typing** > **Dictation**:
 - **Automatic punctuation**: Google speech recognition adds punctuation and capital letters. On by default. Shown on Android 13 or later with Google speech recognition installed.
 - **Block offensive words**: Google speech recognition masks offensive words. On by default. Shown with **Automatic punctuation**.
 - **Auto stop after silence**: stops recording after 1, 2, 3, 5, 10, 15 or 30 seconds, or 1 minute, without speech. The default is **Off**.
-- **Speak dictated text**: reads the text after SandFly types it, except in password fields. Off by default.
+- **Speak dictated text**: reads the text after SandFly types it, except in password fields. On by default.
 - **Keep recognition models loaded**: how long a Whisper model and the On-device AI model stay in memory after use: **Unload after use** (the default), 5, 15 or 30 minutes, or **Until SandFly stops**. A loaded model starts sooner and uses memory.
 - **Model download server**: where models are downloaded from, **Hugging Face** (the default) or **hf-mirror.com**.
 
@@ -290,4 +297,4 @@ While the handwriting keyboard is shown, only commands that open no window run, 
 
 ### Physical keyboards {#typing-physical-keyboard}
 
-While a physical keyboard is connected, the **Physical keyboard** group of **Typing** has **Letter keys press keypad buttons**, **Enter sends messages**, **SandFly keyboard**, **Held keys type**, **Double-press characters**, **Double space types a period**, **Speak password characters** and **Android physical keyboard settings**. These settings are described in [](#keyboards).
+While a physical keyboard is connected, the **Physical keyboard** group of **Typing** has **Letter keys press keypad buttons**, **Enter sends messages**, **SandFly keyboard**, **Held keys type**, **Double-press characters**, **Double space types a period**, **Auto-correct**, **Word suggestions**, **Speak suggestion**, **Enter types the spoken suggestion**, **Word list language**, **Delete learned words**, **Speak password characters** and **Android physical keyboard settings**. These settings are described in [](#keyboards).

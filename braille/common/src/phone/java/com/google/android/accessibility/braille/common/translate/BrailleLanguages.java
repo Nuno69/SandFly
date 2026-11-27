@@ -35,6 +35,7 @@ import java.util.Optional;
  * Code} and {@link TranslatorFactory}.
  */
 public class BrailleLanguages {
+  public static final Locale LOCALE_AF = Locale.forLanguageTag("af");
   public static final Locale LOCALE_AR = Locale.forLanguageTag("ar");
   public static final Locale LOCALE_BG = Locale.forLanguageTag("bg");
   public static final Locale LOCALE_CA = Locale.forLanguageTag("ca");
@@ -60,6 +61,7 @@ public class BrailleLanguages {
   public static final Locale LOCALE_HR = Locale.forLanguageTag("hr");
   public static final Locale LOCALE_HU = Locale.forLanguageTag("hu");
   public static final Locale LOCALE_IS = Locale.forLanguageTag("is");
+  public static final Locale LOCALE_ID = Locale.forLanguageTag("id");
   public static final Locale LOCALE_IT = Locale.ITALIAN;
   public static final Locale LOCALE_JP = Locale.JAPANESE;
   public static final Locale LOCALE_KM = Locale.forLanguageTag("km");
@@ -171,6 +173,23 @@ public class BrailleLanguages {
    */
   // LINT.IfChange(supported_languages)
   public enum Code {
+    AFRIKAANS(
+        LOCALE_AF,
+        R.string.code_user_facing_name_afrikaans,
+        /* supportedContracted= */ true,
+        /* eightDot= */ false) {
+      @Override
+      EditBuffer createEditBuffer(
+          Context context,
+          TalkBackSpeaker talkBack,
+          BrailleTranslator translator,
+          boolean contractedMode) {
+        if (contractedMode) {
+          return new EditBufferCommonContracted(context, translator, talkBack);
+        }
+        return new EditBufferUnContracted(context, translator, talkBack);
+      }
+    },
     ARABIC(
         LOCALE_AR,
         R.string.code_user_facing_name_arabic,
@@ -548,6 +567,23 @@ public class BrailleLanguages {
         R.string.code_user_facing_name_icelandic_comp8,
         /* supportedContracted= */ false,
         /* eightDot= */ true),
+    INDONESIAN(
+        LOCALE_ID,
+        R.string.code_user_facing_name_indonesian,
+        /* supportedContracted= */ true,
+        /* eightDot= */ false) {
+      @Override
+      EditBuffer createEditBuffer(
+          Context context,
+          TalkBackSpeaker talkBack,
+          BrailleTranslator translator,
+          boolean contractedMode) {
+        if (contractedMode) {
+          return new EditBufferIndonesian2(context, translator, talkBack);
+        }
+        return new EditBufferUnContracted(context, translator, talkBack);
+      }
+    },
     ITALIAN_COMP6(
         LOCALE_IT,
         R.string.code_user_facing_name_italian_comp6,

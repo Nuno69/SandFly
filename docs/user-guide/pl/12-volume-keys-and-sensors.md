@@ -13,6 +13,8 @@ Naciśnięcie obu przycisków jednocześnie nie uruchamia polecenia SandFly, dzi
 - **Klawisze głośności regulują suwaki** zmienia działanie przycisków, gdy fokus jest na suwaku. Zamiast głośności zmieniają wtedy wartość suwaka, a SandFly odczytuje nową wartość. Przytrzymaj przycisk, aby zmieniać ją dalej. Domyślnie opcja jest wyłączona.
 - **Klawisze głośności przesuwają kursor** działa, gdy fokus jest w polu tekstowym. Przycisk zwiększania głośności cofa kursor o znak, a przycisk zmniejszania głośności przesuwa kursor o znak do przodu. SandFly odczytuje znak. Domyślnie opcja jest wyłączona.
 
+Gdy przycisk ma też polecenie przypisane do jednego z naciśnięć (zobacz [](#buttons-commands)), jego naciśnięcia uruchamiają polecenia, a naciśnięcie bez polecenia po zakończeniu reguluje suwak albo przesuwa kursor zamiast zmieniać głośność.
+
 Gdy fokus jest gdzie indziej albo ekran jest wygaszony, przyciski zwykle zmieniają głośność. Po przyłożeniu palca do ekranu oraz w trakcie czytania ciągłego nadal służą do regulacji głośności mowy.
 
 ### Uruchamiaj polecenia klawiszami głośności {#buttons-commands}
@@ -32,7 +34,6 @@ W poniższych sytuacjach przyciski zmieniają głośność tak jak zwykle i nie 
 - Ekran jest wygaszony. Wyjątkiem jest widoczny ekran blokady w trybie Always On Display lub włączona opcja **Skróty przy wygaszonym ekranie**. Zobacz [](#buttons-screen-off).
 - Trwa rozmowa telefoniczna lub aplikacja odtwarza dźwięk rozmowy.
 - Trzymasz palec na ekranie lub trwa czytanie ciągłe.
-- Przycisk reguluje suwak albo przesuwa kursor.
 - Na ekranie jest aplikacja Menu skrótów.
 
 Gdy telefon dzwoni, polecenia może uruchomić tylko przycisk, do którego jednego z naciśnięć przypisano **Odbierz połączenie**.
@@ -47,6 +48,15 @@ Obie opcje zostawiają obsługę przycisków Androidowi, gdy ekran jest wygaszon
 ### Skróty przy wygaszonym ekranie {#buttons-screen-off}
 
 Po włączeniu **Skróty przy wygaszonym ekranie** przypisane naciśnięcia wykonują polecenia również wtedy, gdy ekran jest wyłączony. Naciśnięcia bez polecenia zmieniają głośność. Opcja wymaga Shizuku i jest ukryta, gdy SandFly używa zamiast niego dostępu root, a także na zegarkach. Zobacz [](#updates-shizuku). Gdy włączysz ją po raz pierwszy, pojawi się prośba o przyznanie SandFly dostępu do Shizuku. Domyślnie opcja jest wyłączona.
+
+### Klawisz wyciszenia {#buttons-mute-key}
+
+Na telefonach z klawiszem wyciszenia, takich jak Zinwa Q25, ekran **Klawisze głośności** ma dwie dodatkowe opcje.
+
+- **Przytrzymaj klawisz wyciszenia, aby dyktować w polach tekstowych**: gdy pole tekstowe ma fokus wprowadzania, klawiatura jest widoczna lub podłączona i nie trwa rozmowa, przytrzymanie klawisza wyciszenia uruchamia **Dyktuj**. Nagrywanie zaczyna się po naciśnięciu klawisza i kończy po jego zwolnieniu, a SandFly wpisuje tekst. Naciśnięcie klawisza podczas dyktowania do pola tekstowego zatrzymuje dyktowanie. Domyślnie opcja jest włączona. Zobacz [](#typing-dictate).
+- **Naciśnięcie klawisza wyciszenia**: polecenie, które naciśnięcie klawisza wyciszenia uruchamia w pozostałych sytuacjach. Lista jest taka sama jak przy gestach. Domyślnie bez przypisania.
+
+Gdy żadna z tych opcji nie obsłuży naciśnięcia, trafia ono do mapy klawiszy. W mapach telefonu z klawiaturą i we własnych mapach klawisz wyciszenia może mieć własny skrót klawiszowy (zobacz [](#keyboards-keymaps)). W przeciwnym razie naciśnięcie trafia do Androida.
 
 ### Głośność mowy na telefonach Samsung {#buttons-samsung}
 

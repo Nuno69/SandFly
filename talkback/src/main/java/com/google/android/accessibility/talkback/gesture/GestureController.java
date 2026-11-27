@@ -16,7 +16,6 @@
 
 package com.google.android.accessibility.talkback.gesture;
 
-import static android.accessibilityservice.AccessibilityService.GESTURE_DOUBLE_TAP;
 import static android.accessibilityservice.AccessibilityService.GESTURE_DOUBLE_TAP_AND_HOLD;
 import static android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_ACCESSIBILITY_ALL_APPS;
 import static com.google.android.accessibility.talkback.Feedback.AdjustVolume.Action.DECREASE_VOLUME;
@@ -35,6 +34,7 @@ import static com.google.android.accessibility.talkback.Feedback.EditText.Action
 import static com.google.android.accessibility.talkback.Feedback.EditText.Action.CURSOR_TO_END;
 import static com.google.android.accessibility.talkback.Feedback.EditText.Action.CUT;
 import static com.google.android.accessibility.talkback.Feedback.EditText.Action.END_SELECT;
+import static com.google.android.accessibility.talkback.Feedback.EditText.Action.INSERT;
 import static com.google.android.accessibility.talkback.Feedback.EditText.Action.PASTE;
 import static com.google.android.accessibility.talkback.Feedback.EditText.Action.CLEAR_TEXT;
 import static com.google.android.accessibility.talkback.Feedback.EditText.Action.SELECT_ALL;
@@ -148,6 +148,7 @@ import com.google.android.accessibility.talkback.scripting.ItemInspector;
 import com.google.android.accessibility.talkback.scripting.ScriptCommands;
 import com.google.android.accessibility.talkback.scripting.Scripts;
 import com.google.android.accessibility.talkback.calls.AnswerCall;
+import com.google.android.accessibility.talkback.calls.CallerAnnouncer;
 import com.google.android.accessibility.talkback.calls.EndCall;
 import com.google.android.accessibility.talkback.actor.voicecommands.VoiceEditing;
 import com.google.android.accessibility.talkback.dictation.AiDictation;
@@ -207,6 +208,7 @@ import com.google.android.accessibility.utils.TreeDebugRenderer;
 import com.google.android.accessibility.utils.WindowUtils;
 import com.google.android.accessibility.utils.gestures.GestureConfiguration;
 import com.google.android.accessibility.utils.input.CursorGranularity;
+import com.google.android.accessibility.utils.input.ScrollEventInterpreter;
 import com.google.android.accessibility.utils.output.FeedbackItem;
 import com.google.android.accessibility.utils.output.GestureSpeechTiming;
 import com.google.android.accessibility.utils.output.SpeechController;
@@ -258,6 +260,9 @@ public class GestureController {
   private final HandwritingAppLauncher handwritingAppLauncher;
   private final BrailleScreenInput brailleScreenInput;
   private final AiDictation dictation;
+  // For Speak position. Set once the service has made them.
+  private @Nullable ScrollEventInterpreter scrollEventInterpreter;
+  private @Nullable TextTraversalTracker textTraversalTracker;
 
   private final @NonNull Map<Integer, Integer> captureGestureIdToAnnouncements = new HashMap<>();
   // Whether an open training page, such as Practice gestures, takes back-and-forth or angle
@@ -268,8 +273,6 @@ public class GestureController {
   private static volatile boolean trainingTakesGestures;
   private final @NonNull Map<Integer, Integer> captureFingerprintGestureIdToAnnouncements =
       new HashMap<>();
-  // Whether the action being performed is that of the one-finger double tap.
-  private boolean performingDoubleTap;
   // The gesture whose action is being performed, or NO_GESTURE.
   private int performingGestureId = NO_GESTURE;
   private static final int NO_GESTURE = -1;
@@ -525,6 +528,7 @@ public class GestureController {
     R.string.shortcut_value_copy_last_spoken_phrase,
     R.string.shortcut_value_continuous_copy,
     R.string.shortcut_value_submit_text,
+    R.string.shortcut_value_new_line,
     R.string.shortcut_value_clear_text,
     R.string.shortcut_value_character_count,
     R.string.shortcut_value_read_text_field,
@@ -544,6 +548,7 @@ public class GestureController {
     R.string.shortcut_value_describe_text_formatting,
     R.string.shortcut_value_announce_current_time_and_date,
     R.string.shortcut_value_announce_battery_state,
+    R.string.shortcut_value_say_caller,
     R.string.shortcut_value_announce_status,
     R.string.shortcut_value_announce_current_title,
     R.string.shortcut_value_announce_phonetic_pronunciation,
@@ -732,6 +737,7 @@ public class GestureController {
               action,
               pipeline,
               actorState.getDirectionNavigation().hasNavigableWebContent(),
+              actorState.getDirectionNavigation().isSelectionModeActive(),
               eventId);
     } else if (action.equals(service.getString(R.string.shortcut_value_scroll_back))) {
       // At the top of a list, scrolling back pulls it down to refresh, as two fingers do.
@@ -828,6 +834,19 @@ public class GestureController {
     } else if (action.equals(service.getString(R.string.shortcut_value_spell_password_field))) {
       // Only the SandFly keyboard has the text of a password field.
       result = SandFlyKeyboardHost.spellPasswordField();
+      if (!result) {
+        SandFlyKeyboardHost.speak(service.getString(R.string.sandfly_keyboard_needed));
+      }
+    } else if (action.equals(service.getString(R.string.shortcut_value_next_word_suggestion))
+        || action.equals(service.getString(R.string.shortcut_value_previous_word_suggestion))) {
+      String said =
+          SandFlyKeyboardHost.stepSuggestion(
+              action.equals(service.getString(R.string.shortcut_value_next_word_suggestion)));
+      result = said != null;
+      SandFlyKeyboardHost.speak(
+          said != null ? said : service.getString(R.string.sandfly_keyboard_needed));
+    } else if (action.equals(service.getString(R.string.shortcut_value_type_word_suggestion))) {
+      result = SandFlyKeyboardHost.typeSuggestion();
       if (!result) {
         SandFlyKeyboardHost.speak(service.getString(R.string.sandfly_keyboard_needed));
       }
@@ -974,6 +993,8 @@ public class GestureController {
       result =
           pipeline.returnFeedback(
               eventId, Feedback.systemAction(AccessibilityService.GLOBAL_ACTION_POWER_DIALOG));
+    } else if (PowerCommands.isAction(service, action)) {
+      PowerCommands.run(service, pipeline, action);
     } else if (action.equals(service.getString(R.string.shortcut_value_all_apps))) {
       result =
           pipeline.returnFeedback(
@@ -1141,13 +1162,13 @@ public class GestureController {
     } else if (action.equals(
             service.getString(R.string.shortcut_value_action_setting_activate_current_action))
         || action.equals(service.getString(R.string.shortcut_value_perform_click_action))) {
-      // For customized gesture(s) which perform the "Activate"/click action, they are regarded
-      // the same behavior as the native "Double-Tap" gesture.
+      // Activate does what the one-finger double tap does, from any gesture, voice command,
+      // braille command or script that runs it.
       if (selectorController.activateDoubleTapSetting()) {
         return;
       } else if (SelectorController.getCurrentSetting(service).equals(Setting.ACTIONS)) {
         selectorController.activateCurrentAction(eventId);
-      } else if (performingDoubleTap && doubleTapMovesCursor(eventId)) {
+      } else if (doubleTapMovesCursor(eventId)) {
         return;
       } else {
         result = pipeline.returnFeedback(eventId, Feedback.focus(CLICK_CURRENT));
@@ -1343,6 +1364,22 @@ public class GestureController {
       if (!result) {
         pipeline.returnFeedback(eventId, Feedback.sound(R.raw.complete));
       }
+    } else if (action.equals(service.getString(R.string.shortcut_value_new_line))) {
+      AccessibilityNodeInfoCompat node = getEditTextFocus();
+      if (node == null) {
+        result = false;
+      } else if (NewLine.typesNewLine(node)) {
+        result = pipeline.returnFeedback(eventId, Feedback.edit(node, INSERT).setText("\n"));
+        if (result) {
+          // Only "New line", not the text of the field.
+          speak(service.getString(R.string.shortcut_new_line));
+        }
+      } else {
+        result = NewLine.performAction(service, node);
+        if (!result) {
+          pipeline.returnFeedback(eventId, Feedback.sound(R.raw.complete));
+        }
+      }
     } else if (action.equals(service.getString(R.string.shortcut_value_copy_last_spoken_phrase))) {
       pipeline.returnFeedback(
           eventId, Feedback.part().setSpeech(Feedback.Speech.create(COPY_LAST)));
@@ -1528,6 +1565,12 @@ public class GestureController {
       result =
           pipeline.returnFeedback(
               eventId, Feedback.requestedSpeech(batteryMonitor.getBatteryStateDescription()));
+    } else if (action.equals(service.getString(R.string.shortcut_value_say_caller))) {
+      CallerAnnouncer callerAnnouncer = service.getCallerAnnouncer();
+      result =
+          callerAnnouncer != null
+              && pipeline.returnFeedback(
+                  eventId, Feedback.requestedSpeech(callerAnnouncer.sayCallerText()));
     } else if (action.equals(service.getString(R.string.shortcut_value_announce_status))) {
       result =
           pipeline.returnFeedback(eventId, Feedback.requestedSpeech(statusReader.describe()));
@@ -1535,9 +1578,7 @@ public class GestureController {
       result =
           pipeline.returnFeedback(
               eventId,
-              Feedback.requestedSpeech(
-                  ItemPosition.describe(
-                      service, accessibilityFocusMonitor.getAccessibilityFocus(false))));
+              Feedback.requestedSpeech(describePosition()));
     } else if (action.equals(service.getString(R.string.shortcut_value_speak_coordinates))) {
       result =
           pipeline.returnFeedback(
@@ -1712,27 +1753,10 @@ public class GestureController {
     if (LiveRecognition.onGesture(gestureId)) {
       return;
     }
-    // While SandFly takes two-finger swipes, the lock screen never sees one, so it gets SandFly's
-    // own two-finger swipe up to unlock or show the PIN, pattern or password.
-    if (gestureId == AccessibilityService.GESTURE_2_FINGER_SWIPE_UP
-        && GestureLayout.handlesTwoFingerSwipes(SharedPreferencesUtils.getSharedPreferences(service))
-        && SyntheticTouches.isAvailable()
-        && swipeUp.isLockScreenShown()
-        && swipeUp.swipeUp(/* fingers= */ 2)) {
-      return;
-    }
-    // While SandFly takes two-finger swipes, the launcher, which opens its apps list from a
-    // two-finger swipe up, gets SandFly's own swipe up instead.
-    if (gestureId == AccessibilityService.GESTURE_2_FINGER_SWIPE_UP
-        && GestureLayout.handlesTwoFingerSwipes(SharedPreferencesUtils.getSharedPreferences(service))
-        && swipeUp.isHomeScreenShown()
-        && swipeUp.swipeUp(/* fingers= */ 1)) {
-      return;
-    }
     // Quick Tasks take a few gestures for the three seconds after the Quick Tasks command.
     String quickTask = QuickTasks.action(gestureShortcutMapping.getGestureKey(gestureId));
     if (quickTask != null) {
-      performGestureAction(quickTask, eventId, gestureId, /* doubleTap= */ false);
+      performGestureAction(quickTask, eventId, gestureId);
       return;
     }
     // A gesture profile's own gestures come before scripts.
@@ -1757,23 +1781,51 @@ public class GestureController {
         gestureId,
         GestureShortcutMapping.getGestureString(service, gestureId),
         action);
+    if (swipeUpForScrollUp(action)) {
+      return;
+    }
     GestureSpeechTiming.onGesture(action);
     if (TutorialHooks.onGesture(gestureId, action)) {
       return;
     }
     String fallbackAction = action;
     int fallbackGestureId = gestureId;
-    boolean doubleTap = gestureId == GESTURE_DOUBLE_TAP;
     // A script can hand the gesture back later, so the fallback keeps which gesture it was.
     if (!fromProfile
         && !columnSwipe
         && !turnsScriptsOff(action)
         && Scripts.onGesture(
             gestureId,
-            () -> performGestureAction(fallbackAction, eventId, fallbackGestureId, doubleTap))) {
+            () -> performGestureAction(fallbackAction, eventId, fallbackGestureId))) {
       return;
     }
-    performGestureAction(action, eventId, gestureId, doubleTap);
+    performGestureAction(action, eventId, gestureId);
+  }
+
+  /**
+   * While SandFly takes two-finger swipes, the lock screen and the launcher never see one, so the
+   * gesture for Scroll up, Two-finger swipe up by default, sends SandFly's own swipe up there
+   * instead of scrolling: two fingers on the lock screen to unlock it or show the PIN, pattern or
+   * password, one finger on the launcher to open its apps list. A gesture with another command,
+   * Two-finger swipe up included, runs that command. Returns whether the swipe was sent.
+   */
+  private boolean swipeUpForScrollUp(@Nullable String action) {
+    if (action == null
+        || !action.equals(service.getString(R.string.shortcut_value_scroll_up))
+        || !GestureLayout.handlesTwoFingerSwipes(
+            SharedPreferencesUtils.getSharedPreferences(service))) {
+      return false;
+    }
+    boolean sent;
+    if (swipeUp.isLockScreenShown()) {
+      sent = swipeUp.swipeUp(/* fingers= */ 2);
+    } else {
+      sent = swipeUp.isHomeScreenShown() && swipeUp.swipeUp(/* fingers= */ 1);
+    }
+    if (sent) {
+      LogUtils.i(LOG_TAG, "Scroll up sent a swipe up to the lock screen or the launcher");
+    }
+    return sent;
   }
 
   /** Opens the Add label or Edit label dialog for the focused item. */
@@ -1794,20 +1846,13 @@ public class GestureController {
         : LabelDialogManager.editLabel(service, labelId, /* needToRestoreFocus= */ true, pipeline);
   }
 
-  /**
-   * Performs [action] of the gesture [gestureId], noting the gesture and whether it is the
-   * one-finger double tap.
-   */
-  private void performGestureAction(
-      String action, EventId eventId, int gestureId, boolean doubleTap) {
-    boolean previousDoubleTap = performingDoubleTap;
+  /** Performs [action] of the gesture [gestureId], noting the gesture. */
+  private void performGestureAction(String action, EventId eventId, int gestureId) {
     int previousGestureId = performingGestureId;
-    performingDoubleTap = doubleTap;
     performingGestureId = gestureId;
     try {
       performAction(action, eventId);
     } finally {
-      performingDoubleTap = previousDoubleTap;
       performingGestureId = previousGestureId;
     }
   }
@@ -1825,9 +1870,9 @@ public class GestureController {
   }
 
   /**
-   * With Double-tap moves cursor to start or end on, moves the cursor of the text field that
-   * accessibility focus is on, while it has input focus and the keyboard is shown, to the start of
-   * its text, or to the end when it is at the start. Returns whether it moved the cursor.
+   * With Double-tap moves cursor to start or end on, Activate moves the cursor of the text field
+   * that accessibility focus is on, while it has input focus and the keyboard is shown, to the
+   * start of its text, or to the end when it is at the start. Returns whether it moved the cursor.
    */
   private boolean doubleTapMovesCursor(EventId eventId) {
     if (!SharedPreferencesUtils.getBooleanPref(
@@ -1866,6 +1911,31 @@ public class GestureController {
           captureFingerprintGestureIdToAnnouncements);
     }
     onTrainingOpen(/* open= */ true);
+  }
+
+  /** Sets where Speak position finds scroll positions and the cursor in text that apps move. */
+  public void setPositionSources(
+      ScrollEventInterpreter scrollEventInterpreter, TextTraversalTracker textTraversalTracker) {
+    this.scrollEventInterpreter = scrollEventInterpreter;
+    this.textTraversalTracker = textTraversalTracker;
+  }
+
+  /** Returns the position of the focused item for Speak position. */
+  private String describePosition() {
+    @Nullable AccessibilityNodeInfoCompat focused =
+        accessibilityFocusMonitor.getAccessibilityFocus(false);
+    @Nullable ScrollEventInterpreter scrolls = scrollEventInterpreter;
+    @Nullable TextTraversalTracker traversals = textTraversalTracker;
+    @Nullable TextCursor cursor =
+        TextPosition.cursorOf(
+            focused,
+            actorState.getDirectionNavigation().ownTextCursor(focused),
+            traversals == null ? null : traversals.cursor());
+    return ItemPosition.describe(
+        service,
+        focused,
+        cursor,
+        node -> scrolls == null ? -1 : scrolls.scrollPercent(node));
   }
 
   /** Notes whether the training is open, whose current page may take gestures. */

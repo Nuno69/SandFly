@@ -132,16 +132,48 @@ object VoiceEditingRules {
   ): List<Commands.Command> =
     categories.filter { it.titleRes in titles }.flatMap { it.commands }.filter { it.value !in excluded }
 
-  /** Commands by their normalized names; the first command with a name keeps it. */
+  /**
+   * Commands by their normalized names, and by their [aliases], other names by command value; the
+   * first command with a name keeps it.
+   */
   @JvmStatic
-  fun commandNames(commands: List<Commands.Command>, locale: Locale): Map<String, Commands.Command> {
+  @JvmOverloads
+  fun commandNames(
+    commands: List<Commands.Command>,
+    locale: Locale,
+    aliases: Map<String, List<String>> = emptyMap(),
+  ): Map<String, Commands.Command> {
     val names = HashMap<String, Commands.Command>()
     for (command in commands) names.putIfAbsent(VoiceGrammar.normalize(command.label, locale), command)
+    addAliases(names, commands, aliases, locale)
     return names
   }
 
-  /** The phrases of voice editing: joining words, fillers and typing, without the other patterns. */
+  /** Adds the [aliases] of [commands] to [names], after the names the commands have. */
   @JvmStatic
+  fun addAliases(
+    names: MutableMap<String, Commands.Command>,
+    commands: List<Commands.Command>,
+    aliases: Map<String, List<String>>,
+    locale: Locale,
+  ) {
+    if (aliases.isEmpty()) return
+    val byValue = commands.associateBy { it.value }
+    for ((value, phrases) in aliases) {
+      val command = byValue[value] ?: continue
+      for (phrase in phrases) {
+        val name = VoiceGrammar.normalize(phrase, locale)
+        if (name.isNotEmpty()) names.putIfAbsent(name, command)
+      }
+    }
+  }
+
+  /**
+   * The phrases of voice editing: joining words, fillers, typing and text editing, without the other
+   * patterns. Text editing phrases act on the text only, without activating items.
+   */
+  @JvmStatic
+  @JvmOverloads
   fun phrases(
     chain: List<String>,
     and: List<String>,
@@ -150,6 +182,7 @@ object VoiceEditingRules {
     cancel: List<String>,
     type: List<String>,
     run: List<String>,
+    text: VoiceGrammar.TextPhrases = VoiceGrammar.TextPhrases(),
   ): VoiceGrammar.Phrases =
     VoiceGrammar.Phrases(
       chain = chain,
@@ -170,6 +203,8 @@ object VoiceEditingRules {
       run = run,
       open = emptyList(),
       tap = emptyList(),
+      text = text,
+      textFallback = false,
     )
 
   /**

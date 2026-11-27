@@ -54,6 +54,7 @@ import com.google.android.accessibility.talkback.notificationlist.NotificationLi
 import com.google.android.accessibility.talkback.notifications.NotificationXmlFragment
 import com.google.android.accessibility.talkback.notifications.SpokenSchedules
 import com.google.android.accessibility.talkback.preference.TalkBackPreferenceFilter
+import com.google.android.accessibility.talkback.preference.base.AutomaticDescriptionsFragment
 import com.google.android.accessibility.talkback.preference.base.BrailleFragment
 import com.google.android.accessibility.talkback.preference.base.GestureListPreference
 import com.google.android.accessibility.talkback.preference.base.ItemListFragment
@@ -73,6 +74,7 @@ import com.google.android.accessibility.utils.SettingsUtils
 import com.google.android.accessibility.utils.SharedPreferencesUtils
 import com.google.android.accessibility.utils.monitor.InputDeviceMonitor
 import com.google.android.accessibility.utils.output.CapturePolicy
+import com.google.android.accessibility.utils.ocr.TesseractRecognizer
 import com.google.android.accessibility.utils.output.HapticPatternParser
 import com.google.android.libraries.accessibility.utils.log.LogUtils
 import java.util.concurrent.ExecutionException
@@ -404,6 +406,11 @@ object SettingsIndex {
     hideIf(Distribution.IS_PLAY, "pref_updates_screen")
     hideIf(Distribution.IS_PLAY, "pref_shizuku_root_screen")
     hideIf(!ImageCaptioner.supportsImageCaption(context), R.string.pref_auto_image_captioning_key)
+    // AutomaticDescriptionsFragment: watch builds have no Tesseract.
+    hideIf(
+      !TesseractRecognizer.IS_AVAILABLE,
+      AutomaticDescriptionsFragment.KEY_CYRILLIC_TEXT_RECOGNITION,
+    )
     // During setup.
     hideIf(!SettingsUtils.allowLinksOutOfSettings(context), R.string.pref_manage_labels_key)
 
@@ -431,6 +438,7 @@ object SettingsIndex {
       R.string.pref_show_exit_watermark_key,
     )
     hideIf(wear || tv, "pref_practice_gestures_help")
+    hideIf(wear, "pref_key_practice_help")
     hideIf(wear, "pref_user_guide")
     hideIf(wear, R.string.pref_export_settings_key)
     hideIf(wear, R.string.pref_import_settings_key)
@@ -453,6 +461,18 @@ object SettingsIndex {
     hideIf(!physicalKeyboard || wear || tv, R.string.pref_sandfly_keyboard_double_press_key)
     hideIf(!physicalKeyboard || wear || tv, R.string.pref_sandfly_keyboard_double_space_period_key)
     hideIf(!physicalKeyboard || wear || tv, R.string.pref_speak_password_characters_key)
+    hideIf(!physicalKeyboard || wear || tv, R.string.pref_sandfly_keyboard_autocorrect_key)
+    hideIf(!physicalKeyboard || wear || tv, R.string.pref_sandfly_keyboard_suggestions_key)
+    hideIf(!physicalKeyboard || wear || tv, R.string.pref_sandfly_keyboard_suggestion_pause_key)
+    hideIf(
+      !physicalKeyboard || wear || tv,
+      R.string.pref_sandfly_keyboard_enter_types_suggestion_key,
+    )
+    hideIf(!physicalKeyboard || wear || tv, R.string.pref_sandfly_keyboard_word_language_key)
+    hideIf(
+      !physicalKeyboard || wear || tv,
+      R.string.pref_sandfly_keyboard_delete_learned_words_key,
+    )
     hideIf(!physicalKeyboard || !KeypadKeys.isAvailable(), R.string.pref_keypad_letter_keys_key)
 
     // VolumeKeysFragment.
@@ -492,6 +512,10 @@ object SettingsIndex {
     hideIf(noAiActions, R.string.pref_ai_actions_included_key)
     hideIf(!FeatureSupport.doesServiceHandleDoubleTap(), R.string.pref_selector_text_entities_key)
     hideIf(!FeatureSupport.doesServiceHandleDoubleTap(), R.string.pref_selector_clipboard_history_key)
+    hideIf(
+      !FeatureSupport.doesServiceHandleDoubleTap() || wear || tv,
+      R.string.pref_selector_word_suggestions_key,
+    )
 
     // ContextMenuFragment.
     hideIf(

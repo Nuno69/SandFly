@@ -635,12 +635,15 @@ public class KeyComboManager
     }
 
     // While the SandFly keyboard's emoji search or symbol chooser is open, every key pressed is its
-    // own, up to its release; in its editing mode, every key pressed without the SandFly key. Keys
-    // pressed before, such as the shortcut that opened it, are released here.
+    // own, up to its release; in its editing mode, every key pressed without the SandFly key; while
+    // a word is typed with word suggestions on, Up and Down, and while its list is open, the keys
+    // that move through it, type a suggestion and close it. Keys pressed before, such as the
+    // shortcut that opened it, are released here.
     if (event.getAction() == KeyEvent.ACTION_DOWN) {
       if (keysPassedToChooser.contains(event.getKeyCode())
           || SandFlyKeyboardHost.isChoosing()
-          || (SandFlyKeyboardHost.isEditingModeOn() && !isSandFlyKeyEvent(event))) {
+          || (SandFlyKeyboardHost.isEditingModeOn() && !isSandFlyKeyEvent(event))
+          || (!isSandFlyKeyEvent(event) && SandFlyKeyboardHost.takesKey(event.getKeyCode()))) {
         keysPassedToChooser.add(event.getKeyCode());
         return false;
       }
@@ -2190,6 +2193,13 @@ public class KeyComboManager
           return true;
         }
       }
+      logKeysWithoutCommandInPractice(
+          event,
+          new KeyCombo(
+              otherModifiers,
+              KeyComboModel.NO_PREFIX_KEY_CODE,
+              getConvertedKeyCode(event),
+              /* triggerModifierUsed= */ false));
       // TalkBack may not handle the key event in this case. Add the current keys to the passed
       // keys set to avoid the key event being handled by TalkBack when not needed.
       passedKeys.addAll(currentKeysDown);
@@ -2282,9 +2292,25 @@ public class KeyComboManager
     }
 
     if (!hasPartialMatch) {
+      logKeysWithoutCommandInPractice(event, currentKeyCombo);
       passedKeys.addAll(currentKeysDown);
     }
     return hasPartialMatch;
+  }
+
+  /**
+   * Logs keys that run no command and go to the app while the tutorial's practice lesson is shown,
+   * which says only keys that run a command.
+   */
+  private void logKeysWithoutCommandInPractice(KeyEvent event, KeyCombo keyCombo) {
+    if (event.getRepeatCount() == 0
+        && !KeyEvent.isModifierKey(event.getKeyCode())
+        && TutorialHooks.isPracticing()) {
+      LogUtils.i(
+          TAG,
+          "Keys without a command in tutorial practice, passed to the app: %s",
+          getKeyComboStringRepresentation(keyCombo));
+    }
   }
 
   private void announcePerformedShortcutAndAction(

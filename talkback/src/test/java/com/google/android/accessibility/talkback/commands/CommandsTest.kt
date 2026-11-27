@@ -89,6 +89,7 @@ class CommandsTest {
         R.string.shortcut_value_speech_history,
         R.string.shortcut_value_character_count,
         R.string.shortcut_value_read_text_field,
+        R.string.shortcut_value_new_line,
         R.string.shortcut_value_switch_keyboard,
         R.string.shortcut_value_app_gestures_for_app,
         R.string.shortcut_value_continuous_copy,
@@ -98,6 +99,7 @@ class CommandsTest {
         R.string.shortcut_value_share_focused_image,
         R.string.shortcut_value_share_screenshot,
         R.string.shortcut_value_voice_editing,
+        R.string.shortcut_value_say_caller,
       )) {
       assertTrue(context.getString(res) in values)
     }

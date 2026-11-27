@@ -39,7 +39,7 @@ The **Text and symbols** group sets how text, punctuation, capital letters and e
 - **Speak punctuation and symbols**: **All** says every punctuation mark and symbol. **Most** says most symbols, such as & and @, but leaves common punctuation, such as commas and apostrophes, to the speech engine. **Some**, the default, leaves punctuation and symbols to the speech engine. **None** leaves punctuation and symbols out of speech, except a character read on its own, such as when moving by character. Apostrophes and hyphens inside words, separators inside numbers, and punctuation that ends a word are left to the speech engine. **Learn more**, in the list, opens a web page about punctuation levels.
 - **Say symbols that change meaning**, shown while **Speak punctuation and symbols** is **None**: leaves these to the speech engine: a plus or minus sign directly before a number, degree, percent, per mille and currency signs, and + − × ÷ = < > between numbers. Off by default.
 - **Capital letters**: what SandFly does for a capital letter: **Do nothing**, **Say “capital”**, the default, **Change pitch**, or **Play sound**. With any other choice than **Say “capital”**, SandFly sends a capital letter on its own to the speech engine in lower case.
-- **Emoji**, **Count repeated emoji** and **Speak "emoji" after emoji names**: see [](#verbosity-emoji).
+- **Emoji**, **Count repeated emoji** and **After emoji names**: see [](#verbosity-emoji).
 - **Count repeated symbols**: says how many times a symbol repeats when it repeats 4 or more times. On by default.
 - **Speak text formatting** and **Text formatting options**: see [](#verbosity-text-formatting).
 
@@ -56,7 +56,10 @@ Some speech engines read emoji badly, use names of their own, or don't read them
 Two more settings depend on **Emoji**:
 
 - **Count repeated emoji**: with **Read by SandFly**, says an emoji repeated in a row once with a count, such as "3 grinning face". Choose **Off**, the default, or from **2 or more** to **6 or more**.
-- **Speak "emoji" after emoji names**: says "emoji" after each emoji. Off by default. Not available with **None**.
+- **After emoji names**: what follows each emoji. Not available with **None**.
+  - **Nothing**: the default.
+  - **Say "emoji"**: says "emoji" after each emoji, such as "grinning face emoji".
+  - **Play a sound**: plays the **Emoji** sound after each emoji, or once after emoji next to each other. Emoji are then spoken as separate utterances from the text around them. A sound theme can replace the sound, and **Individual sounds and vibrations** can turn it off. See [](#sound-events).
 
 With **Read by SandFly**, moving by character names a whole emoji once, and moving by word stops on emoji. With **None**, moving by word skips emoji. Copying or spelling the last spoken phrase gives the emoji, not their names.
 
@@ -87,8 +90,9 @@ The **Announcements** group sets what SandFly says when something changes:
 - **Window names**: when SandFly says the name of a window. **Always** says it when a window opens and when focus moves into it from another window, before the first item. **Always, cut off by the first item**, the default, does the same, but the first item focused in a new window stops the name. **Only when a window opens** doesn't say it when focus moves into a window. **Never** says no window names.
 - **Always speak number of list items**: says which items are showing after every scroll. Off by default. With it off, SandFly says no list position when a list scrolls.
 - **Announce full charge**: says "Battery fully charged" and plays the **Full charge** sound once when the battery is full while the charger is connected. Off by default.
-- **Battery level**: says the battery level, charging or not, each time it reaches a multiple of 5% or 10%, or every 15 minutes, 30 minutes or hour. Nothing is said while the screen is off. Off by default.
+- **Battery level**: says the battery level, charging or not, each time it reaches a multiple of 5% or 10%, or every 15 minutes, 30 minutes or hour. Nothing is said while the screen is off: a level reached or an interval ended while it was off is said when the screen turns on. Off by default.
 - **Battery level voice**: the voice for **Battery level**: **Notification voice**, **SandFly's voice**, the default, or a voice profile. See [](#notifications-voice).
+- **Announce caller**: how often SandFly says the caller when a phone call or an app's call, such as a WhatsApp call, starts ringing. **Once**, the default, says it when the call notification arrives. **Repeat while ringing** says it again every 5 seconds, after any speech in progress, until the call is answered, declined or ends. For the calls of apps, it needs notification access for SandFly. See [](#notifications-access). **Off** leaves the call notification unread, and the **Say caller** command says the caller on request. See [](#commands-calls).
 - **Announce call length**: when a phone call ends, says how long it lasted, from when the call was answered or dialed. Calls that weren't answered aren't announced. Off by default.
 - **Announce keyboard shown or hidden**: on by default.
 - **Screen on and off**: what SandFly says when the screen turns off or on and when the phone is unlocked. See [](#verbosity-screen-on-off).
@@ -131,7 +135,7 @@ Some apps and keyboards speak by themselves, such as an assistant that speaks it
 
 - **Speak only focus moved by the user**: **Off**, the default, **In all apps**, or **In chosen apps**. While it applies, SandFly speaks focus that you move by touch, gestures, keys, a braille display or commands. It doesn't speak focus that the app moves, announcements, live region changes, window names or window change announcements. Focus that SandFly moves after a window changes, after a scroll, or to follow input focus counts as moved by the app.
 - **Chosen apps**: the apps for **In chosen apps**. Available only while **Speak only focus moved by the user** is **In chosen apps**. Choose **Add app** to add one, and choose an app to remove it.
-- **Speak only focus moved by the user while an assistant or call plays audio**: does the same in all apps while another app plays audio as an assistant or a call. Focus that you move is still spoken. Off by default.
+- **Speak only focus moved by the user while an assistant or call plays audio**: does the same in all apps while another app plays audio as an assistant or a call, and while an assistant window, such as Gemini over an app or the lock screen, is shown. The screen-on and unlock readouts are left out then too, and speech stops when an assistant window opens. Focus that you move is still spoken. Off by default.
 - **Keyboards with their own speech**: while a keyboard in this list is shown, SandFly doesn't speak its keys, the text typed or deleted, or the cursor moving in the edit field. Gestures and commands still work, and moving through text with reading controls is still spoken. Choose **Add keyboard** to add one.
 
 SandFly never speaks the announcements, live region changes, window changes, toasts or notifications of com.oplus.viewtalk, an accessibility service on realme and OPPO phones that sends image descriptions such as "Image may contain…".

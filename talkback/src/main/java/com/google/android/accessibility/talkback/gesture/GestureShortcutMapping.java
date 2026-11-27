@@ -2671,6 +2671,13 @@ public class GestureShortcutMapping implements GestureShortcutProvider {
         R.string.shortcut_value_toggle_editing_mode, R.string.shortcut_toggle_editing_mode),
     SPELL_PASSWORD_FIELD(
         R.string.shortcut_value_spell_password_field, R.string.shortcut_spell_password_field),
+    NEXT_WORD_SUGGESTION(
+        R.string.shortcut_value_next_word_suggestion, R.string.shortcut_next_word_suggestion),
+    PREVIOUS_WORD_SUGGESTION(
+        R.string.shortcut_value_previous_word_suggestion,
+        R.string.shortcut_previous_word_suggestion),
+    TYPE_WORD_SUGGESTION(
+        R.string.shortcut_value_type_word_suggestion, R.string.shortcut_type_word_suggestion),
     PREV_CONTAINER(R.string.shortcut_value_prev_container, R.string.shortcut_prev_container),
     NEXT_CONTAINER(R.string.shortcut_value_next_container, R.string.shortcut_next_container),
     PREVIOUS_WINDOW(R.string.shortcut_value_previous_window, R.string.shortcut_previous_window),
@@ -2702,6 +2709,8 @@ public class GestureShortcutMapping implements GestureShortcutProvider {
         R.string.shortcut_value_system_quick_settings, R.string.shortcut_system_quick_settings),
     LOCK_SCREEN(R.string.shortcut_value_lock_screen, R.string.shortcut_lock_screen),
     POWER_MENU(R.string.shortcut_value_power_menu, R.string.shortcut_power_menu),
+    RESTART_PHONE(R.string.shortcut_value_restart_phone, R.string.shortcut_restart_phone),
+    POWER_OFF_PHONE(R.string.shortcut_value_power_off_phone, R.string.shortcut_power_off_phone),
     ALL_APPS(R.string.shortcut_value_all_apps, R.string.shortcut_all_apps),
     A11Y_BUTTON(R.string.shortcut_value_a11y_button, R.string.shortcut_a11y_button),
     A11Y_BUTTON_LONG_PRESS(
@@ -2877,6 +2886,7 @@ public class GestureShortcutMapping implements GestureShortcutProvider {
         R.string.shortcut_value_announce_current_title, R.string.shortcut_announce_current_title),
     ANNOUNCE_BATTERY_STATE(
         R.string.shortcut_value_announce_battery_state, R.string.shortcut_announce_battery_state),
+    SAY_CALLER(R.string.shortcut_value_say_caller, R.string.shortcut_say_caller),
     ANNOUNCE_STATUS(R.string.shortcut_value_announce_status, R.string.shortcut_announce_status),
     SPEAK_POSITION(R.string.shortcut_value_speak_position, R.string.shortcut_speak_position),
     SPEAK_COORDINATES(

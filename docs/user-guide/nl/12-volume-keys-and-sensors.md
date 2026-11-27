@@ -13,6 +13,8 @@ Beide volumetoetsen samen indrukken voert geen SandFly-opdracht uit, zodat de to
 - **Volumetoetsen passen schuifregelaars aan**: als een schuifregelaar focus heeft, wijzigen volume omhoog en volume omlaag de waarde ervan in plaats van het volume, en SandFly spreekt de nieuwe waarde uit. Houd een toets ingedrukt om de waarde te blijven wijzigen. Standaard uit.
 - **Volumetoetsen verplaatsen de cursor**: als een tekstveld focus heeft, beweegt volume omhoog de cursor een teken terug en volume omlaag een teken verder, en SandFly spreekt het teken uit. Standaard uit.
 
+Als een toets ook een opdracht heeft voor een van zijn drukken (zie [](#buttons-commands)), voeren de drukken hun opdrachten uit, en een druk zonder opdracht past de schuifregelaar aan of beweegt de cursor zodra hij eindigt, in plaats van het volume te wijzigen.
+
 Als de focus op iets anders staat, of het scherm uit is, wijzigen de volumetoetsen het volume zoals gewoonlijk. Met een vinger op het scherm of tijdens doorlopend lezen wijzigen ze nog steeds het spraakvolume.
 
 ### Opdrachten uitvoeren met de volumetoetsen {#buttons-commands}
@@ -34,10 +36,9 @@ De drukken voeren geen opdrachten uit, en de toetsen wijzigen het volume zoals g
 - Terwijl het scherm uit is, tenzij het vergrendelscherm wordt getoond op een always-on-display, of **Sneltoetsen voor volumetoetsen met het scherm uit** aanstaat. Zie [](#buttons-screen-off).
 - Tijdens een telefoongesprek, of terwijl een app gespreksaudio afspeelt.
 - Terwijl een vinger op het scherm staat, of tijdens doorlopend lezen.
-- Als de toets een schuifregelaar aanpast of de cursor beweegt.
 - Terwijl de app Shortcut Menu wordt getoond.
 
-Terwijl een gesprek overgaat, voert alleen een volumetoets met de opdracht **Gesprek beantwoorden** toegewezen aan een van zijn drukken, opdrachten uit.
+Terwijl een gesprek overgaat, voert alleen een volumetoets met de opdracht **Gesprek beantwoorden** of **Gesprek beëindigen** toegewezen aan een van zijn drukken, opdrachten uit.
 
 ### Volumetoetsdrukken van Android weghouden {#buttons-take-all}
 
@@ -49,6 +50,15 @@ Beide instellingen laten de toetsen aan Android terwijl het scherm uit is, tijde
 ### Sneltoetsen voor volumetoetsen met het scherm uit {#buttons-screen-off}
 
 Met **Sneltoetsen voor volumetoetsen met het scherm uit** aan voeren de drukken op volumetoetsen met opdrachten die uit terwijl het scherm uit is. Drukken zonder opdracht wijzigen het volume. De instelling vereist Shizuku, en wordt niet getoond als SandFly root gebruikt in plaats van Shizuku, of op smartwatches; zie [](#updates-shizuku). De eerste keer dat je deze instelling aanzet, toont Shizuku een verzoek om SandFly toe te staan. Standaard uit.
+
+### Dempknop {#buttons-mute-key}
+
+Op telefoons met een dempknop, zoals de Zinwa Q25, heeft **Volumetoetsen** nog twee instellingen:
+
+- **Dempknop ingedrukt houden om te dicteren in tekstvelden**: als een tekstveld invoerfocus heeft, een toetsenbord wordt getoond of is aangesloten, en er geen gesprek actief is, voert het vasthouden van de dempknop **Dicteren** uit: de opname begint als je op de knop drukt en stopt als je de knop loslaat, en SandFly typt de tekst. Een druk op de knop tijdens een dictee in een tekstveld stopt dat dictee. Standaard aan. Zie [](#typing-dictate).
+- **Dempknop indrukken**: de opdracht die een druk op de dempknop overal elders uitvoert. De lijst is dezelfde als voor gebaren. Standaard niet toegewezen.
+
+Als geen van beide instellingen een druk gebruikt, gaat de druk naar de keymap, waar de dempknop een eigen sneltoets kan zijn in de toetsenbordtelefoon-keymaps en in eigen keymaps (zie [](#keyboards-keymaps)), en daarna naar Android.
 
 ### Spraakvolume op Samsung-telefoons {#buttons-samsung}
 

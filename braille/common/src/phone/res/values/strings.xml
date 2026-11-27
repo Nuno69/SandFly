@@ -32,6 +32,8 @@
   <string name="code_user_facing_name_spanish_comp8">Spanish 8-dot Computer Braille</string>
   <!-- Language list preference item for the Arabic language. [CHAR_LIMIT=40] -->
   <string name="code_user_facing_name_arabic">Arabic</string>
+  <!-- Language list preference item for the Afrikaans braille language. [CHAR_LIMIT=40] -->
+  <string name="code_user_facing_name_afrikaans">Afrikaans</string>
   <!-- Language list preference item for the Arabic 8 dots computer braille language. [CHAR_LIMIT=40] -->
   <string name="code_user_facing_name_arabic_comp8">Arabic 8-dot Computer Braille</string>
   <!-- Language list preference item for the Bulgarian language. [CHAR_LIMIT=40] -->
@@ -122,6 +124,8 @@
   <string name="code_user_facing_name_icelandic">Icelandic</string>
   <!-- Language list preference item for the Icelandic 8 dots computer braille language. [CHAR_LIMIT=60] -->
   <string name="code_user_facing_name_icelandic_comp8">Icelandic 8-dot Computer Braille</string>
+  <!-- Language list preference item for the Indonesian braille language, which has uncontracted and contracted (Tusing) braille. [CHAR_LIMIT=40] -->
+  <string name="code_user_facing_name_indonesian">Indonesian</string>
   <!-- Language list preference item for the Italian 6 dots computer braille language. [CHAR_LIMIT=60] -->
   <string name="code_user_facing_name_italian_comp6">Italian 6-dot Computer Braille</string>
   <!-- Language list preference item for the Italian 8 dots computer braille language. [CHAR_LIMIT=60] -->

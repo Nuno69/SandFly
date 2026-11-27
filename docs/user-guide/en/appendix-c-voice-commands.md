@@ -2,7 +2,7 @@
 
 These are the English phrases that SandFly accepts as voice commands. Words in capitals stand for what you say in their place, such as a name or a text. Words in parentheses are optional, and a slash separates words that can take each other's place: "describe (the/this) image" is "describe image", "describe the image" or "describe this image". Case and the punctuation that the speech recognizer adds don't matter. For how to start a voice command, chain commands and make your own phrases, see [](#voice-commands).
 
-Besides these phrases, you can say the name of any command as the **Commands** screen shows it, such as "Read from top", "Next item" or "Describe image", including the names of macros, custom menus and script commands. Custom voice commands come before every phrase here. See [](#voice-commands-phrases).
+Besides these phrases, you can say the name of any command as the **Commands** screen shows it, such as "Read from top", "Next item" or "Describe image", including the names of macros, custom menus and script commands. The name of an app opens the app, unless a command has that name. Custom voice commands come before every phrase here. See [](#voice-commands-phrases).
 
 Some phrases are found anywhere in what you say: they are marked "a phrase with". For example, "go to the top" contains "top" and moves to the first item.
 
@@ -50,13 +50,36 @@ These phrases act on the focused edit field.
 | Say | What happens |
 | --- | --- |
 | "Type TEXT", or "write TEXT", "enter TEXT", "input TEXT", "dictate TEXT" or "spell TEXT" | Types the text. |
+| "New line", or "new paragraph" or "press enter" | Types a new line in a text field of several lines, or performs the action of a field of one line. |
 | "Select all" | Selects all the text. |
 | "Select", or "start select", "start selection" or "start selection mode" | Starts selection mode. |
 | "Finish select", or "finish selection", "finish selection mode" or "end select" | Ends selection mode. |
-| A phrase with "copy" | Copies the selected text. |
-| A phrase with "cut" | Cuts the selected text. |
+| A phrase with "copy" | Copies the selected text. With a text field focused, see [](#appendix-voice-commands-text). |
+| A phrase with "cut" | Cuts the selected text. With a text field focused, see [](#appendix-voice-commands-text). |
 | A phrase with "paste" | Pastes the clipboard. |
-| A phrase with "delete" | Deletes the selected text. |
+| A phrase with "delete" | Deletes the selected text. With a text field focused, see [](#appendix-voice-commands-text). |
+
+### Text in a text field {#appendix-voice-commands-text}
+
+These phrases act on the text of the text field with input focus. UNITS is a number and "characters", "words", "sentences", "lines" or "paragraphs", such as "3 words" or "five words", or one of them alone, such as "word". The number is 1 to 20 in words, or digits. "Character", "letter" and "letters" work too. UNIT is "word", "sentence", "line", "paragraph" or "text"; "field", "text field" and "document" are the text too. For how the phrases count and what SandFly says, see [](#voice-commands-text).
+
+| Say | What happens |
+| --- | --- |
+| "Next UNITS", or "to (the) next UNITS", "right (by) UNITS" or "forward (by) UNITS" | Moves the cursor forward over the units. |
+| "Previous UNITS", or "to (the) previous UNITS", "last UNITS", "left (by) UNITS", "back (by) UNITS" or "backward (by) UNITS" | Moves the cursor back over the units. |
+| "(To) (the) start of (the) UNIT", or "(to) (the) beginning of (the) UNIT" | Moves the cursor to the start of the unit. |
+| "(To) (the) end of (the) UNIT" | Moves the cursor to the end of the unit. |
+| "To (the) start", or "to (the) beginning" | Moves the cursor to the start of the text. |
+| "To (the) end" | Moves the cursor to the end of the text. |
+| "Move (the) (cursor)" or "go", and one of the phrases above | Moves the cursor, such as "move cursor left 3 words" or "go to the end of the line". |
+| "Select", or "highlight", and one of the phrases above | Selects the text from the cursor, such as "select next 2 words". |
+| "Copy" and one of the phrases above | Copies the text from the cursor, such as "copy previous sentence". |
+| "Cut" and one of the phrases above | Cuts the text from the cursor, such as "cut to end of paragraph". |
+| "Delete", or "remove" or "erase", and one of the phrases above | Deletes the text from the cursor, such as "delete last 5 words". |
+| "Select TEXT", or "highlight TEXT" | Selects the text in the field. Without it, activates the item on the screen with that text. |
+| "Copy TEXT" | Copies the text in the field. |
+| "Cut TEXT" | Cuts the text in the field. |
+| "Delete TEXT", or "remove TEXT" or "erase TEXT" | Deletes the text in the field. |
 
 ### Speech {#appendix-voice-commands-speech}
 
@@ -94,7 +117,7 @@ These phrases act on the focused edit field.
 | Say | What happens |
 | --- | --- |
 | "Open APP", or "launch APP", "start APP" or "switch to APP" | Opens the app. |
-| "Tap ITEM", or "tap on ITEM", "double tap (on) ITEM", "click (on) ITEM", "press ITEM", "activate ITEM" or "select ITEM" | Activates the item on the screen with that text. |
+| "Tap ITEM", or "tap on ITEM", "double tap (on) ITEM", "click (on) ITEM", "press ITEM", "activate ITEM" or "select ITEM" | Activates the item on the screen with that text. "Select ITEM" selects the text in the focused text field when it has the text. |
 | "Run COMMAND", or "do COMMAND" | Runs the command, macro or script command with that name. |
 | "Run (the) NAME macro", or "run (the) macro NAME" | Runs the macro. |
 | "Wait", or "wait (a) second" | Waits 1 second. |
@@ -102,7 +125,7 @@ These phrases act on the focused edit field.
 
 ### Calls and messages {#appendix-voice-commands-calls}
 
-NAME is a contact name or a phone number. APP is the name of a messaging app, such as WhatsApp. Without an app, or with "SMS", "text", "text message" or "messages", the message goes to the default SMS app. In the SMS app and WhatsApp, SandFly writes the message to the contact and then asks whether to send it. Other apps get only the text, and you choose the chat in the app.
+NAME is a contact name or a phone number. APP is the name of a messaging app, such as WhatsApp. Without an app, or with "SMS", "text", "text message" or "messages", the message goes to the default SMS app. In the SMS app and WhatsApp, SandFly writes the message to the contact and then requests confirmation before sending it. Other apps get only the text, and you choose the chat in the app.
 
 | Say | What happens |
 | --- | --- |
@@ -111,8 +134,9 @@ NAME is a contact name or a phone number. APP is the name of a messaging app, su
 | "Message NAME TEXT", or "text NAME TEXT" or "send (a) message to NAME TEXT" | Writes the message to the contact named at the start. |
 | "Message NAME on APP saying TEXT", or "send (a) message to NAME on APP saying TEXT", "send (a) message to NAME on APP that says TEXT", "send (a/an) APP message to NAME saying TEXT", "send (a/an) APP message to NAME that says TEXT" or "tell NAME on APP TEXT" | Writes the message in the app. |
 | "Send (a/an) APP message to NAME" | Records the text, then writes the message in the app. |
+| "Answer call", "End call" or "Say caller" | Runs the command of that name: answers the ringing call, declines it or ends the call in progress, or says the caller of the ringing call. |
 
-SandFly asks "Send to NAME: TEXT?", or "Send to NAME?" for a description. Say "yes", "yeah", "yep", "send", "send it", "OK", "okay", "sure" or "do it" to press **Send**. Any other answer leaves the message unsent, and SandFly says "Message not sent".
+SandFly says "Send to NAME: TEXT?", or "Send to NAME?" for a description. Say "yes", "yeah", "yep", "send", "send it", "OK", "okay", "sure" or "do it" to press **Send**. Any other answer leaves the message unsent, and SandFly says "Message not sent".
 
 ### Descriptions {#appendix-voice-commands-descriptions}
 

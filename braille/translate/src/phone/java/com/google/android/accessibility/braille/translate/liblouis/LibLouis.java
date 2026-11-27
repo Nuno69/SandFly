@@ -27,6 +27,10 @@ public class LibLouis implements TranslatorFactory {
   @Override
   public BrailleTranslator create(Context context, String codeName, boolean contractedMode) {
     switch (codeName) {
+      case "AFRIKAANS" -> {
+        return getBrailleTranslator(
+            context, codeName, contractedMode, "afr-za-g1.ctb", "afr-za-g2.ctb");
+      }
       case "ARABIC" -> {
         LibLouisTranslator uncontracted = new LibLouisTranslator(context, codeName, "ar-ar-g1.utb");
         LibLouisTranslator contracted = new LibLouisTranslator(context, codeName, "ar-ar-g2.ctb");
@@ -166,6 +170,10 @@ public class LibLouis implements TranslatorFactory {
       }
       case "ICELANDIC_COMP8" -> {
         return new LibLouisTranslator(context, codeName, "is.ctb");
+      }
+      case "INDONESIAN" -> {
+        return getBrailleTranslator(
+            context, codeName, contractedMode, "id-id-g1.utb", "id-id-g2.ctb");
       }
       case "ITALIAN_COMP6" -> {
         return new LibLouisTranslator(context, codeName, "it.tbl");

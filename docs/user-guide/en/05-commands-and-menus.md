@@ -19,20 +19,20 @@ The list holds only the commands that the device supports. For example, commands
 - **Object navigation** and **Screen review**: commands for desktop-style object navigation and the review cursor, mostly for keyboards. See [](#keyboards).
 - **Activation**: **Activate**, **Touch and hold**, **Activate with a tap**, **Hold a touch on the focused item**, **Activate confirm button**, **Activate cancel button**, **Show custom actions**, **Addresses and numbers**, **Add or edit labels**, **Open SandFly menu**, **Pass through system gesture**, **Turn direct touch on or off for this app**, and **Double tap taps the screen in this app**.
 - **Scrolling**: scroll forward, back, up, down, left and right, to the top and to the bottom, and **Refresh**.
-- **Navigate by text** and **Navigate by element**: next and previous character, word, line, paragraph, heading, link, control, button, list, table, landmark and other kinds of item.
+- **Navigate by text** and **Navigate by element**: next and previous character, word, line, sentence, paragraph, heading, link, control, button, list, table, landmark and other kinds of item.
 - **Tables**: next and previous row and column, the start and end of rows, columns and tables, and row and column headers.
 - **Web**: **Turn browse mode on or off**, lists of headings, landmarks, links, controls and tables, and the address of a link or page. See [](#web).
-- **Reading**: **Read from top**, **Read from focused item**, **Read from focused item by reading control**, repeat, spell and translate the last spoken phrase, **Speech history**, **Speak status**, **Speak position**, **Speak coordinates**, the date and time, the battery level and the window title.
+- **Reading**: **Read from top**, **Read from focused item**, **Read from focused item by reading control**, repeat, spell and translate the last spoken phrase, **Speech history**, **Speak status**, **Speak position**, **Speak coordinates**, the date and time, the battery level, **Say caller** and the window title.
 - **Speech**: **Pause or resume speech**, **Turn speech on or off**, speech rate, pitch and volume, spoken language, voice profiles, punctuation, keyboard echo, **Use voice effects**, **Audio ducking** and **Vibration feedback**.
 - **Reading controls**: next and previous reading control, **First reading control**, **Move reading control down or forward** and **Move reading control up or backward**, **Write the letter of a reading control**, next and previous reading control list, and a **Set reading control to** command for each reading control in the list. See [](#commands-reading-controls).
-- **Text editing**: selection mode, cursor movement, select all, copy, cut, paste, **Clipboard history**, **Editing menu**, **Submit text**, **Clear text**, **Copy last spoken phrase**, **Copy text from screen**, **Continuous copy**, **Granular editing**, **Spelling / grammar suggestions**, **Search emoji**, **Choose a symbol**, **Turn editing mode on or off**, **Spell the password field**, **Dictate**, **Start voice editing** and **Switch keyboard**. See [](#typing).
-- **System actions**: **Home**, **Back**, **Overview**, previous, older and newer app, **Take screenshot**, **Answer call**, **End call**, **Split screen**, notifications, Quick Settings, **Lock screen**, **Power menu**, **All apps**, the accessibility shortcut, magnification, color inversion, **Write an app's name to open it**, **Type an app's name in braille to open it**, and **Start voice command**.
+- **Text editing**: selection mode, cursor movement, select all, copy, cut, paste, **Clipboard history**, **Editing menu**, **Submit text**, **New line**, **Clear text**, **Copy last spoken phrase**, **Copy text from screen**, **Continuous copy**, **Granular editing**, **Spelling / grammar suggestions**, **Search emoji**, **Choose a symbol**, **Turn editing mode on or off**, **Spell the password field**, **Next word suggestion**, **Previous word suggestion**, **Type word suggestion**, **Dictate**, **Start voice editing** and **Switch keyboard**. See [](#typing).
+- **System actions**: **Home**, **Back**, **Overview**, previous, older and newer app, **Take screenshot**, **Answer call**, **End call**, **Split screen**, notifications, Quick Settings, **Lock screen**, **Power menu**, **Restart phone**, **Power off phone**, **All apps**, the accessibility shortcut, magnification, color inversion, **Write an app's name to open it**, **Type an app's name in braille to open it**, and **Start voice command**.
 - **Media and volume**: play or pause, next and previous track, rewind, fast forward, and volume.
 - **Notifications**: read notifications, read the last notification again, stop reading, and turn notification speech and time announcements on or off. See [](#notifications).
 - **Image and screen descriptions**: **Take picture and describe**, **Describe image**, **Describe screen**, their **Speak** and **Ask about** versions, **Share image of focused item**, **Share screenshot** and **Report AI response**. With SandFly Pro, also the screen recognition commands. See [](#descriptions).
 - **Live recognition**: a command for each Live recognition mode, and **Stop Live recognition**.
 - **Braille**: **Switch to braille keyboard**, **Braille commands**, **Find text**, braille command profiles, and braille display commands. See [](#braille).
-- **SandFly**: **Pause SandFly**, **Hide or show screen**, **Show the focus indicator**, **Screen search**, gesture and settings profiles, **Gestures for this app**, **Turn arrow key navigation on or off**, **Lock or unlock touch**, **Turn all scripts on or off**, **Script commands**, **Verbosity**, **Turn off SandFly**, **Open tutorial**, **Practice gestures** and **Turn keyboard practice on or off**. With SandFly Pro, also **Start or stop AI agent task**.
+- **SandFly**: **Pause SandFly**, **Hide or show screen**, **Show the focus indicator**, **Screen search**, gesture and settings profiles, **Gestures for this app**, **Quick Tasks**, **Turn BlackBerry mode on or off**, **Turn arrow key navigation on or off**, **Lock or unlock touch**, **Turn all scripts on or off**, **Script commands**, **Verbosity**, **Turn off SandFly**, **Open tutorial**, **Practice gestures** and **Turn keyboard practice on or off**. With SandFly Pro, also **Start or stop AI agent task**.
 - **Developer settings**: **Inspect focused item**, **Copy item details** and **Copy screen tree**. See [](#macros-inspect).
 - **Setting values**: a next value and a previous value command for each reading control that changes a setting, such as **Punctuation: next value**, and commands that turn settings such as **Wrap around** on or off.
 
@@ -43,14 +43,24 @@ These categories list what you add yourself, and are shown only when they have c
 - **Macros**: one command for each macro, **Stop macro**, and **Record a macro**. See [](#macros).
 - **Gesture profiles**, **Braille command profiles** and **Voice profiles**: one command for each profile, which puts it in use.
 - **Reading control lists**: **Next item in** and **Previous item in** a list, for each list. See [](#commands-reading-control-lists).
-- **Open app**: one command for each installed app.
-- **App shortcuts** and **Accessibility shortcuts**: the shortcuts of apps and of other accessibility features. See [](#gestures).
+- **Open app**: one command for each installed app, named **Open** and the name of the app, such as **Open Gmail**.
+- **App shortcuts** and **Accessibility shortcuts**: the shortcuts of apps and of other accessibility features. See [](#gestures-app-shortcuts).
 - **App tiles**: the quick settings tiles of installed apps. SandFly clicks the tile in the system quick settings, which it opens and closes. With Shizuku running, SandFly first adds the tile to the system quick settings when it isn't there, and clicks it through Shizuku when it isn't found there. A tile is named as the system quick settings showed it when SandFly last read them, such as the name of the device that a Bluetooth tile connects.
-- **System tiles**: the tiles of the system quick settings that **Add system tile** in the quick settings panel settings found last. With Shizuku running, **Add system tile** gives SandFly DUMP and usage access and reads the tiles from the system; otherwise it looks through the system quick settings. While SandFly has DUMP and usage access, it reads the tiles again when it starts. A system tile that SandFly has a control for, such as Wi-Fi, Hotspot or the sound mode, is that control, named as in SandFly's quick settings panel; the Internet tile is Wi-Fi. When a control needs Shizuku and Shizuku isn't running, SandFly announces "Shizuku not running". Other system tiles, such as screen recording, are named as the system names them, and are activated in the system quick settings, which SandFly opens and closes; SandFly then announces the new state. See [](#display-quick-settings-edit).
+- **System tiles**: the tiles of the system quick settings that **Add system tile** in the quick settings panel settings found last. With Shizuku running, **Add system tile** gives SandFly DUMP and usage access and reads the tiles from the system; otherwise it looks through the system quick settings. While SandFly has DUMP and usage access, it reads the tiles again when it starts. A system tile that SandFly has a control for, such as Wi-Fi, Hotspot or the sound mode, is that control, named as in the SandFly quick settings panel; the Internet tile is Wi-Fi. When a control needs Shizuku and Shizuku isn't running, SandFly announces "Shizuku not running". Other system tiles, such as screen recording, are named as the system names them, and are activated in the system quick settings, which SandFly opens and closes; SandFly then announces the new state. See [](#display-quick-settings-edit).
 
 #### Speak status {#commands-status}
 
 **Speak status**, in the **Reading** category, reads what the status bar shows, such as the time, the battery level and the network, and whether the screen is hidden. By default, a two-finger triple-tap runs it. To choose what it reads and in what order, go to **Verbosity** > **Status readout**. See [](#verbosity).
+
+#### Speak position {#commands-position}
+
+**Speak position**, in the **Reading** category, says where the focused item is:
+
+- In a list or table: "Item 3 of 10" or "Row 2 of 4, column 3 of 5".
+- In text: the character after the cursor, the length of the text, the paragraph when there is more than one, and how far into the text the cursor is, such as "Character 120 of 800, paragraph 2 of 5, 15%". In a text field with the cursor in it, this is the cursor of the field. In other text, it is the place reached by moving through the text with **Characters**, **Words**, **Lines**, **Sentences** or **Paragraphs** since focus moved to the item. Paragraphs are separated by line breaks.
+- In a list, page or other view that scrolls: how far it is scrolled, such as "Scroll position 40%". At the start it is 0% and at the end 100%. In between, the percentage is from the last scroll of the view since the window opened; before the view has scrolled, it is left out.
+
+When none of these applies, SandFly says "No position". With VoiceOver gestures, a three-finger tap runs it.
 
 #### Activate confirm button and Activate cancel button {#commands-button-commands}
 
@@ -60,12 +70,13 @@ SandFly looks in the active window first, such as a dialog, then in the other ap
 
 To change the labels, choose the command in **Commands**, then **Button labels**, and enter one label per line. Your list replaces the built-in one. To use the built-in list again, delete every label.
 
-#### Answer call and End call {#commands-calls}
+#### Answer call, End call and Say caller {#commands-calls}
 
-**Answer call** and **End call**, in the **System actions** category and unassigned by default, act on phone calls and on the calls of apps such as WhatsApp.
+**Answer call** and **End call**, in the **System actions** category, and **Say caller**, in the **Reading** category, act on phone calls and on the calls of apps such as WhatsApp. They are unassigned by default.
 
 - **Answer call** answers the ringing call. SandFly says "No incoming call" when none rings.
 - **End call** declines the ringing call, or else ends the call in progress. SandFly says "No call" when there is none.
+- **Say caller** says the caller of the ringing call, also with **Verbosity** > **Announce caller** off. SandFly says "No incoming call" when none rings. See [](#verbosity-announcements).
 
 Phone calls are answered and ended through Android. The first time, SandFly requests permission to answer calls. The calls of apps are answered, declined and ended with the buttons of their call notification. Ending a call in progress needs notification access for SandFly. See [](#notifications-access).
 
@@ -178,7 +189,7 @@ When you change the reading control or its value with a gesture, SandFly also sh
 
 #### Reading controls you can add {#commands-reading-control-groups}
 
-- **Actions for current item**: **Actions**, **Addresses and numbers**, **Clipboard history** and **Proofread**, which moves between spelling and grammar suggestions.
+- **Actions for current item**: **Actions**, **Addresses and numbers**, **Clipboard history**, **Word suggestions**, which moves through the suggestions for the word typed with the SandFly keyboard, and **Proofread**, which moves between spelling and grammar suggestions. See [](#keyboards-word-suggestions). With **Actions** selected, swipe up or down to choose a command for the focused item, then double-tap to run it. Apps can offer commands such as **Reply** or **Archive**.
 - **Basic navigation**: **Default navigation**, **Windows**, **Containers**, **Screen search**, **Vertical navigation**, **Scroll** and **Wrap around**.
 - **Navigate by text**: **Characters**, **Words**, **Lines**, **Sentences** and **Paragraphs**.
 - **Element navigation**: **Headings**, **Links**, **Controls**, **Landmarks**, **Buttons**, **Checkboxes**, **Radio buttons**, **Edit fields**, **Combo boxes**, **Focusable items**, **Images and videos**, **Lists**, **List items**, **Tables**, **Visited links** and **Unvisited links**.
@@ -195,7 +206,7 @@ When you change the reading control or its value with a gesture, SandFly also sh
 
 By default, the list has **Actions**, **Proofread**, **Screen search**, **Characters**, **Words**, **Lines**, **Paragraphs**, **Headings**, **Links**, **Controls**, **Rows and columns**, **Speech rate**, **Live recognition**, **AI actions**, **Brightness** and **Gesture profile**. Scripts can add reading controls of their own, which follow the list.
 
-**Actions**, **Addresses and numbers**, **Clipboard history**, **Live recognition**, **AI actions** and custom reading controls need Android 11 or later.
+**Actions**, **Addresses and numbers**, **Clipboard history**, **Word suggestions**, **Live recognition**, **AI actions** and custom reading controls need Android 11 or later.
 
 Some controls have options, which follow the control in **Current** and are hidden while it isn't in the list:
 

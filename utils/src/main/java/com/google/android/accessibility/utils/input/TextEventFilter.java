@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongPredicate;
+import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -121,6 +122,15 @@ public class TextEventFilter {
    * that a character typed, deleted or moved over there isn't spoken again as a bullet.
    */
   private @Nullable BooleanSupplier passwordCharacterSuppressor;
+
+  /**
+   * Tells whether a text change is the SandFly keyboard's own edit, a correction or a word
+   * suggestion it typed, which it says itself.
+   */
+  private @Nullable Predicate<AccessibilityEvent> keyboardEditSuppressor;
+
+  /** Told after each text change is handled, spoken or dropped. */
+  private @Nullable Runnable textChangeHandledListener;
 
   ///////////////////////////////////////////////////////////////////////////////////
   // Member variables
@@ -277,6 +287,10 @@ public class TextEventFilter {
           }
           if (isOneCharacterChange(event) && isPasswordSpokenByKeyboard(event)) {
             LogUtils.d(TAG, "Drop text change: the SandFly keyboard says the password character.");
+            return;
+          }
+          if (keyboardEditSuppressor != null && keyboardEditSuppressor.test(event)) {
+            LogUtils.d(TAG, "Drop text change: the SandFly keyboard says the word it typed.");
             return;
           }
         }
@@ -456,6 +470,28 @@ public class TextEventFilter {
   /** Leaves out text changes, removals and replacements included, at times [suppressor] accepts. */
   public void setTextChangeSuppressor(@Nullable LongPredicate suppressor) {
     this.textChangeSuppressor = suppressor;
+  }
+
+  /**
+   * Leaves out the text changes that [suppressor] accepts, the SandFly keyboard's own edits, which
+   * it says itself.
+   */
+  public void setTextChangeHandledListener(@Nullable Runnable listener) {
+    this.textChangeHandledListener = listener;
+  }
+
+  /**
+   * Tells the listener that a text change of [event] was handled: its speech, if any, is queued.
+   */
+  public void onTextEventHandled(AccessibilityEvent event) {
+    if (textChangeHandledListener != null
+        && event.getEventType() == AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED) {
+      textChangeHandledListener.run();
+    }
+  }
+
+  public void setKeyboardEditSuppressor(@Nullable Predicate<AccessibilityEvent> suppressor) {
+    this.keyboardEditSuppressor = suppressor;
   }
 
   /**

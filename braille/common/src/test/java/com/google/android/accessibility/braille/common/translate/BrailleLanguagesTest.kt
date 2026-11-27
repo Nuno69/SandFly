@@ -96,6 +96,30 @@ class BrailleLanguagesTest {
   }
 
   @Test
+  fun indonesianCodeConfiguration() {
+    val indonesian = Code.valueOf("INDONESIAN")
+    assertEquals(Locale.forLanguageTag("id").language, indonesian.locale.language)
+    assertTrue(indonesian.isSupportsContracted(context))
+    assertFalse(indonesian.isEightDot)
+    assertTrue(indonesian.isAvailable(context))
+    assertEquals("Indonesian", indonesian.getUserFacingName(context))
+  }
+
+  @Test
+  fun defaultCodeForIndonesianLocale() {
+    val originalLocale = Locale.getDefault()
+    try {
+      Locale.setDefault(Locale.forLanguageTag("id"))
+      assertEquals(Code.INDONESIAN, BrailleLanguages.getDefaultCode(context))
+
+      Locale.setDefault(Locale.forLanguageTag("id-ID"))
+      assertEquals(Code.INDONESIAN, BrailleLanguages.getDefaultCode(context))
+    } finally {
+      Locale.setDefault(originalLocale)
+    }
+  }
+
+  @Test
   fun unicodeBrailleCodeConfiguration() {
     val unicode = Code.UNICODE_BRAILLE
     assertTrue(unicode.hasNoLanguage())
@@ -126,6 +150,27 @@ class BrailleLanguagesTest {
     try {
       Locale.setDefault(Locale.ROOT)
       assertFalse(BrailleLanguages.getDefaultCode(context).isInputOnly)
+    } finally {
+      Locale.setDefault(originalLocale)
+    }
+  }
+
+  @Test
+  fun afrikaansCodeConfiguration() {
+    val afrikaans = Code.valueOf("AFRIKAANS")
+    assertEquals("af", afrikaans.locale.language)
+    assertTrue(afrikaans.isSupportsContracted(context))
+    assertFalse(afrikaans.isEightDot)
+    assertTrue(afrikaans.isAvailable(context))
+    assertEquals("Afrikaans", afrikaans.getUserFacingName(context))
+  }
+
+  @Test
+  fun defaultCodeForAfrikaansLocale() {
+    val originalLocale = Locale.getDefault()
+    try {
+      Locale.setDefault(Locale.forLanguageTag("af-ZA"))
+      assertEquals(Code.AFRIKAANS, BrailleLanguages.getDefaultCode(context))
     } finally {
       Locale.setDefault(originalLocale)
     }

@@ -1526,9 +1526,14 @@ public abstract class Feedback {
       CLEAR_TEXT,
       CURSOR_TO_BEGINNING, // Works with stopSelecting.
       CURSOR_TO_END, // Works with stopSelecting.
-      INSERT, // Requires text.
+      INSERT, // Requires text. Works with speakText.
       TYPO_CORRECTION, // Requires text and suggestion.
-      MOVE_CURSOR; // Requires cursor index.
+      MOVE_CURSOR, // Requires cursor index.
+      MOVE_CURSOR_OVER_TEXT, // Requires cursor index. Says text, the text passed over.
+      SELECT_RANGE, // Requires range start and end.
+      COPY_RANGE, // Requires range start and end.
+      CUT_RANGE, // Requires range start and end.
+      DELETE_RANGE; // Requires range start and end.
     }
 
     /** The node edited. Null for actions that work without one, such as copying kept text. */
@@ -1544,11 +1549,26 @@ public abstract class Feedback {
 
     public abstract int cursorIndex();
 
+    /**
+     * Whether INSERT says the inserted text, in place of the field's own text change, as typing on
+     * a keyboard does.
+     */
+    public abstract boolean speakText();
+
+    /** The start of the text that a range action acts on. */
+    public abstract int rangeStart();
+
+    /** The end of the text that a range action acts on. */
+    public abstract int rangeEnd();
+
     public static Builder builder() {
       return new AutoValue_Feedback_EditText.Builder()
           // Set default values that are not null.
           .setStopSelecting(false)
-          .setCursorIndex(-1);
+          .setCursorIndex(-1)
+          .setSpeakText(false)
+          .setRangeStart(-1)
+          .setRangeEnd(-1);
     }
 
     /** Builder for EditText feedback data */
@@ -1567,6 +1587,12 @@ public abstract class Feedback {
           @Nullable SpellingSuggestion spellingSuggestion);
 
       public abstract Builder setCursorIndex(int cursorIndex);
+
+      public abstract Builder setSpeakText(boolean speakText);
+
+      public abstract Builder setRangeStart(int rangeStart);
+
+      public abstract Builder setRangeEnd(int rangeEnd);
 
       public abstract EditText build();
     }

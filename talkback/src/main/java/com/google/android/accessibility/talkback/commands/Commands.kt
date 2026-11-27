@@ -732,6 +732,7 @@ object Commands {
           Key.ANNOUNCE_BATTERY_STATE,
           available = FeatureFlagReader.enableAnnounceBatteryState(context),
         )
+        gesture(R.string.shortcut_value_say_caller, R.string.shortcut_say_caller)
         gesture(
           R.string.shortcut_value_announce_current_title,
           R.string.shortcut_announce_current_title,
@@ -923,6 +924,7 @@ object Commands {
         gesture(R.string.shortcut_value_cut, android.R.string.cut)
         gesture(R.string.shortcut_value_paste, android.R.string.paste)
         gesture(R.string.shortcut_value_submit_text, R.string.shortcut_submit_text)
+        gesture(R.string.shortcut_value_new_line, R.string.shortcut_new_line)
         gesture(R.string.shortcut_value_clear_text, R.string.shortcut_clear_text)
         gesture(R.string.shortcut_value_character_count, R.string.shortcut_character_count)
         gesture(R.string.shortcut_value_read_text_field, R.string.shortcut_read_text_field)
@@ -963,6 +965,21 @@ object Commands {
           R.string.shortcut_spell_password_field,
           available = !FormFactorUtils.isAndroidWear(),
         )
+        gesture(
+          R.string.shortcut_value_next_word_suggestion,
+          R.string.shortcut_next_word_suggestion,
+          available = !FormFactorUtils.isAndroidWear(),
+        )
+        gesture(
+          R.string.shortcut_value_previous_word_suggestion,
+          R.string.shortcut_previous_word_suggestion,
+          available = !FormFactorUtils.isAndroidWear(),
+        )
+        gesture(
+          R.string.shortcut_value_type_word_suggestion,
+          R.string.shortcut_type_word_suggestion,
+          available = !FormFactorUtils.isAndroidWear(),
+        )
         gesture(R.string.shortcut_value_dictate, R.string.shortcut_dictate)
         gesture(R.string.shortcut_value_voice_editing, R.string.shortcut_voice_editing)
         gesture(
@@ -1001,6 +1018,8 @@ object Commands {
         )
         gesture(R.string.shortcut_value_lock_screen, R.string.shortcut_lock_screen)
         gesture(R.string.shortcut_value_power_menu, R.string.shortcut_power_menu)
+        gesture(R.string.shortcut_value_restart_phone, R.string.shortcut_restart_phone)
+        gesture(R.string.shortcut_value_power_off_phone, R.string.shortcut_power_off_phone)
         val systemActions = FeatureSupport.supportGetSystemActions(context)
         gesture(R.string.shortcut_value_all_apps, R.string.shortcut_all_apps, available = systemActions)
         gesture(

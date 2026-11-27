@@ -2,7 +2,7 @@
 
 SandFly reads new notifications as they arrive, and can read the notifications in the shade on request or at a set time. **Notifications** in SandFly settings sets which notifications SandFly reads, what it says, in which voice, and when. It also turns on the SandFly notification list, which can take the place of the notification shade.
 
-Incoming calls are always read, whatever the notification settings are.
+Incoming calls are read whatever the notification settings are. **Verbosity** > **Announce caller** sets whether the caller is said once, repeated while the call rings, or not said. See [](#verbosity-announcements).
 
 ### Notification access {#notifications-access}
 
@@ -15,12 +15,13 @@ Some features need notification access for SandFly, which Android settings give:
 - Summaries of the notifications in the shade.
 - The SandFly notification list.
 - Ending the call in progress of an app, such as WhatsApp, with **End call**. See [](#commands-calls).
+- Repeating the caller of an app's call with **Verbosity** > **Announce caller**. See [](#verbosity-announcements).
 
 To give notification access, select **Turn on notification access** on the **When to read**, **Stop reading** or **Summary and time** screen, and turn on SandFly in the list. The item is shown only while SandFly has no notification access. SandFly connects to notifications only while SandFly is on.
 
 ### Turn notification speech on or off {#notifications-speech-on-off}
 
-**Notifications** > **Speak notifications** turns reading new notifications on or off. It's on by default. Incoming calls are read while it is off.
+**Notifications** > **Speak notifications** turns reading new notifications on or off. It's on by default. Incoming calls are read while it is off, as **Verbosity** > **Announce caller** sets.
 
 You can also turn notification speech on or off with:
 
@@ -263,11 +264,12 @@ In the list:
 - A group is one item. Double-tap it to show its notifications.
 - Each notification has its actions and, where the app offers it, a reply field with **Send**.
 - Media notifications show **Playing** or **Paused**, with **Previous**, **Play** or **Pause**, and **Next**.
+- A notification without text, such as a weather notification with a layout of its own, is read with the text of its layout, or else with its sub text, info text or summary text.
 - Text longer than about 160 characters is cut. The **Show all** action reads the whole text, and **Show less** cuts it again.
 - **Dismiss** removes a notification, and **Clear all** removes all that can be removed.
 - **Quick settings** opens the quick settings.
 
-While the phone is locked, the **Notifications** command opens the system shade, which hides what you chose to hide on the lock screen. The **System notification shade** command always opens the system shade. SandFly's list opens as a screen of its own, so the app in front pauses. Some apps end what they are doing when they pause: wireless debugging pairing in Settings fails when the pairing code is entered from SandFly's list. Use **System notification shade** for those.
+While the phone is locked, the **Notifications** command opens the system shade, which hides what you chose to hide on the lock screen. The **System notification shade** command always opens the system shade. The SandFly list opens as a screen of its own, so the app in front pauses. Some apps end what they are doing when they pause: wireless debugging pairing in Settings fails when the pairing code is entered from the SandFly list. Use **System notification shade** for those.
 
 Settings for the list:
 

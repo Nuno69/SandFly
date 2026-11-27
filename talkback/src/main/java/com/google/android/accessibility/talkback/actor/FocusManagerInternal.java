@@ -517,6 +517,24 @@ public class FocusManagerInternal {
   }
 
   /**
+   * Notes a Back that an app runs itself, such as SandFly's settings showing the screen before,
+   * unless a Back that SandFly ran or saw still waits for its list: that Back is the same one.
+   * Backs from the navigation bar or the system Back gesture don't reach SandFly otherwise.
+   */
+  void onBackInApp() {
+    if (history.isBackPending(SystemClock.uptimeMillis())) {
+      return;
+    }
+    noteBack("Back run by the app");
+    onBack();
+  }
+
+  /** Ends the pending Back, given up before it ran, without dropping an activated item. */
+  void onBackCancelled() {
+    history.cancelBack();
+  }
+
+  /**
    * Within {@link AccessibilityFocusActionHistory#RESTORE_AFTER_BACK_MS} of a Back, focuses the
    * list item activated before in the same window, as when an app shows a folder's list again in
    * place of the subfolder's. Focus is left alone when it was moved by the user after the Back,
@@ -915,6 +933,21 @@ public class FocusManagerInternal {
     }
     if (nodeToFocus == null) {
       return false;
+    }
+
+    // The remembered item is gone. Prefer the list that moved it to the first window control.
+    if (type.get() == FocusActionInfo.FIRST_FOCUSABLE_NODE
+        && service instanceof TalkBackService talkBack) {
+      AccessibilityNodeInfoCompat item =
+          talkBack.itemInRecentlyScrolledList(TraversalStrategy.SEARCH_FOCUS_UNKNOWN);
+      if (item != null
+          && setAccessibilityFocus(
+              item,
+              /* forceRefocusIfAlreadyFocused= */ false,
+              FocusActionInfo.builder().setSourceAction(FocusActionInfo.MANUAL_SCROLL).build(),
+              eventId)) {
+        return true;
+      }
     }
 
     boolean firstTime =

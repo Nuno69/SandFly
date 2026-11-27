@@ -91,7 +91,7 @@ Note: The tutorial only takes gestures that SandFly recognizes. If **Handle gest
 
 #### Keyboard tutorial {#getting-started-keyboard-tutorial}
 
-If a physical keyboard is connected when SandFly starts for the first time, SandFly opens the **SandFly keyboard tutorial** instead. It teaches the keyboard shortcuts of your keymap in 15 lessons, including **Keyboard shortcut list**, **Browse mode** for web pages, and **Keyboard practice**. When a device has both a touch screen and a physical keyboard, **SandFly tutorial** opens a dialog with **Touch tutorial** and **Keyboard tutorial**. See [](#keyboards).
+On a device with a physical keyboard and no touch screen, SandFly opens the **SandFly keyboard tutorial** the first time instead. It teaches the keyboard shortcuts of your keymap in 15 lessons, including **Keyboard shortcut list**, **Browse mode** for web pages, and **Keyboard practice**. When a device has both a touch screen and a physical keyboard, **SandFly tutorial** opens a dialog with **Touch tutorial** and **Keyboard tutorial**. See [](#keyboards).
 
 Watches and TVs have tutorials of their own. See [](#devices).
 
@@ -143,6 +143,8 @@ The **Gestures** and **Keyboard shortcuts** screens have a **Search** of their o
 ### The user guide {#getting-started-user-guide}
 
 This guide opens from **Help & feedback** > **User guide** in the SandFly settings. It starts with a table of contents, and links in the text go to the sections they name. The guide is shown in the language of SandFly. Chapters that aren't translated into that language are shown in English.
+
+Most SandFly settings screens have **Help** in the app bar, after the screen title. **Help** opens the section of this guide about that screen. Links in the section to other sections open those sections, and **Back to contents** opens the whole guide.
 
 ### Move from Backtalk Aaron {#getting-started-backtalk}
 

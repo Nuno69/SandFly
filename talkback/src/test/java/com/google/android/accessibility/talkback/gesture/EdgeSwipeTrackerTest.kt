@@ -473,15 +473,32 @@ class EdgeSwipeTrackerTest {
 
   @Test
   fun horizontalMenuGoesAcrossTheScreenFromItsEdge() {
-    // Four items of 75 pixels each, from the left edge.
+    // Four items of 50 pixels each, beyond the first stage, 100 pixels from the left edge. The
+    // first item is where the menu takes over, and nearer the edge too.
     menus = mapOf(MenuEdge.LEFT to 4)
     horizontalMenus = setOf(MenuEdge.LEFT)
-    slideSideways(5f, 500f, 50f, 110f, 160f, 290f, 60f, 2f)
+    slideSideways(5f, 500f, 50f, 110f, 160f, 210f, 290f, 60f, 2f)
     assertEquals(
-      listOf("start", "LEFT -1>1", "LEFT 1>2", "LEFT 2>3", "LEFT 3>0", "LEFT chose 0"),
+      listOf(
+        "start", "LEFT -1>0", "LEFT 0>1", "LEFT 1>2", "LEFT 2>3", "LEFT 3>0", "LEFT chose 0",
+      ),
       events,
     )
     assertEquals(listOf<Pair<Edge, Int>>(), ended)
+  }
+
+  @Test
+  fun horizontalMenuItemStartIsWhereTheItemOfHorizontalMenuItemBegins() {
+    // Seven items in the 260 pixels beyond a 40-pixel first stage of a 300-pixel-wide screen.
+    for (item in 0 until 7) {
+      val start = EdgeSwipeTracker.horizontalMenuItemStart(item, 7, 300f, 40f)
+      val end = EdgeSwipeTracker.horizontalMenuItemStart(item + 1, 7, 300f, 40f)
+      assertEquals(item, EdgeSwipeTracker.horizontalMenuItem((start + end) / 2, 7, 300f, 40f))
+    }
+    assertEquals(40f, EdgeSwipeTracker.horizontalMenuItemStart(0, 7, 300f, 40f), 0.001f)
+    assertEquals(300f, EdgeSwipeTracker.horizontalMenuItemStart(7, 7, 300f, 40f), 0.001f)
+    assertEquals(0, EdgeSwipeTracker.horizontalMenuItem(10f, 7, 300f, 40f))
+    assertEquals(EdgeSwipeTracker.NO_ITEM, EdgeSwipeTracker.horizontalMenuItem(10f, 7, 30f, 40f))
   }
 
   @Test
@@ -492,7 +509,7 @@ class EdgeSwipeTrackerTest {
     slideThrough(5f, 300f, 5f, 360f, 5f, 400f)
     assertEquals(
       listOf(
-        "start", "RIGHT -1>1", "RIGHT 1>3", "RIGHT chose 3",
+        "start", "RIGHT -1>0", "RIGHT 0>3", "RIGHT chose 3",
         "start", "LEFT -1>1", "LEFT chose 1",
       ),
       events,
@@ -508,7 +525,7 @@ class EdgeSwipeTrackerTest {
     )
     assertEquals(
       listOf(
-        "start", "LEFT -1>1", "LEFT 1>-1", "LEFT -1>1", "LEFT 1>-1", "LEFT -1>2", "LEFT 2>-1",
+        "start", "LEFT -1>0", "LEFT 0>-1", "LEFT -1>0", "LEFT 0>-1", "LEFT -1>1", "LEFT 1>-1",
         "LEFT chose -1",
       ),
       events,
@@ -521,7 +538,7 @@ class EdgeSwipeTrackerTest {
     horizontalMenus = setOf(MenuEdge.LEFT)
     // 45 degrees down: up and down count from where the menu took over, not from the touch.
     slideThrough(5f, 500f, 55f, 550f, 105f, 600f)
-    assertEquals(listOf("start", "LEFT -1>1", "LEFT chose 1"), events)
+    assertEquals(listOf("start", "LEFT -1>0", "LEFT chose 0"), events)
   }
 
   @Test
